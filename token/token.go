@@ -2,7 +2,7 @@ package token
 
 import "fmt"
 
-type TokenType int
+type TokenType uint8
 
 type Token struct {
 	Type    TokenType
