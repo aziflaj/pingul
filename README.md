@@ -2,10 +2,10 @@
 
 According to Github Copilot, Pingul is a penguin. I'm not sure if that's true, but I'm going to trust it.
 
-According to me, it's a Work in Progress interpreter. For now, it can parse this code:
+According to me, it's a Work in Progress interpreter. For now, it only has a Lexer and can parse this piece of code:
 
-```javascript
-input := `var age = 28;
+```js
+var age = 28;
 var timeGoesBy = func(currentAge, yearsPassed) {
 	return currentAge + yearsPassed;
 };
