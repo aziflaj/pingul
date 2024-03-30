@@ -13,7 +13,14 @@ var timeGoesBy = func(currentAge, yearsPassed) {
 	return currentAge + yearsPassed;
 };
 
-var newAge = timeGoesBy(age, 1);`
+var newAge = timeGoesBy(age, 1);
+age < newAge;
+age <= newAge;
+age > newAge;
+age >= newAge;
+age == newAge;
+age != newAge;
+`
 
 	tests := []struct {
 		expectedType    token.TokenType
@@ -53,6 +60,37 @@ var newAge = timeGoesBy(age, 1);`
 		{token.INT, []rune("1")},
 		{token.RPAREN, []rune(")")},
 		{token.SEMICOLON, []rune(";")},
+
+		{token.IDENTIFIER, []rune("age")},
+		{token.LESS_THAN, []rune("<")},
+		{token.IDENTIFIER, []rune("newAge")},
+		{token.SEMICOLON, []rune(";")},
+
+		{token.IDENTIFIER, []rune("age")},
+		{token.LESS_THAN_OR_EQUAL, []rune("<=")},
+		{token.IDENTIFIER, []rune("newAge")},
+		{token.SEMICOLON, []rune(";")},
+
+		{token.IDENTIFIER, []rune("age")},
+		{token.GREATER_THAN, []rune(">")},
+		{token.IDENTIFIER, []rune("newAge")},
+		{token.SEMICOLON, []rune(";")},
+
+		{token.IDENTIFIER, []rune("age")},
+		{token.GREATER_THAN_OR_EQUAL, []rune(">=")},
+		{token.IDENTIFIER, []rune("newAge")},
+		{token.SEMICOLON, []rune(";")},
+
+		{token.IDENTIFIER, []rune("age")},
+		{token.EQUAL, []rune("==")},
+		{token.IDENTIFIER, []rune("newAge")},
+		{token.SEMICOLON, []rune(";")},
+
+		{token.IDENTIFIER, []rune("age")},
+		{token.NOT_EQUAL, []rune("!=")},
+		{token.IDENTIFIER, []rune("newAge")},
+		{token.SEMICOLON, []rune(";")},
+
 		{token.EOF, []rune("")},
 	}
 

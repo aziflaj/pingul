@@ -26,6 +26,14 @@ const (
 	DIVIDE
 	MODULUS
 
+	// Comparison
+	EQUAL
+	NOT_EQUAL
+	GREATER_THAN
+	LESS_THAN
+	GREATER_THAN_OR_EQUAL
+	LESS_THAN_OR_EQUAL
+
 	// Delimiters
 	COMMA
 	SEMICOLON //12
@@ -63,6 +71,20 @@ var Operators = map[rune]TokenType{
 	'*': MULTIPLY,
 	'/': DIVIDE,
 	'%': MODULUS,
+}
+
+var ComparisonOperators = map[string]TokenType{
+	"==": EQUAL,
+	"!=": NOT_EQUAL,
+	">":  GREATER_THAN,
+	"<":  LESS_THAN,
+	">=": GREATER_THAN_OR_EQUAL,
+	"<=": LESS_THAN_OR_EQUAL,
+}
+
+func IsComparisonOperator(r []rune) bool {
+	_, ok := ComparisonOperators[string(r)]
+	return ok
 }
 
 func IsInteger(literal []rune) bool {

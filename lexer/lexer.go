@@ -41,6 +41,8 @@ func (l *Lexer) NextToken() token.Token {
 		tkn.Type = token.Operators[rune(tkn.Literal[0])]
 	case token.IsKeyword(tkn.Literal):
 		tkn.Type = token.Keywords[string(tkn.Literal)]
+	case token.IsComparisonOperator(tkn.Literal):
+		tkn.Type = token.ComparisonOperators[string(tkn.Literal)]
 
 	case token.IsInteger(tkn.Literal):
 		tkn.Type = token.INT
