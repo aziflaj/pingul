@@ -8,21 +8,52 @@ import (
 )
 
 func TestNextToken(t *testing.T) {
-	input := `=+(){},;`
+	input := `var age = 28;
+var timeGoesBy = func(currentAge, yearsPassed) {
+	return currentAge + yearsPassed;
+};
+
+var newAge = timeGoesBy(age, 1);`
 
 	tests := []struct {
 		expectedType    token.TokenType
-		expectedLiteral string
+		expectedLiteral []rune
 	}{
-		{token.ASSIGNMENT, "="},
-		{token.PLUS, "+"},
-		{token.LPAREN, "("},
-		{token.RPAREN, ")"},
-		{token.LBRACE, "{"},
-		{token.RBRACE, "}"},
-		{token.COMMA, ","},
-		{token.SEMICOLON, ";"},
-		{token.EOF, ""},
+		{token.VAR, []rune("var")},
+		{token.IDENTIFIER, []rune("age")},
+		{token.ASSIGNMENT, []rune("=")},
+		{token.INT, []rune("28")},
+		{token.SEMICOLON, []rune(";")},
+
+		{token.VAR, []rune("var")},
+		{token.IDENTIFIER, []rune("timeGoesBy")},
+		{token.ASSIGNMENT, []rune("=")},
+		{token.FUNC, []rune("func")},
+		{token.LPAREN, []rune("(")},
+		{token.IDENTIFIER, []rune("currentAge")},
+		{token.COMMA, []rune(",")},
+		{token.IDENTIFIER, []rune("yearsPassed")},
+		{token.RPAREN, []rune(")")},
+		{token.LBRACE, []rune("{")},
+		{token.RETURN, []rune("return")},
+		{token.IDENTIFIER, []rune("currentAge")},
+		{token.PLUS, []rune("+")},
+		{token.IDENTIFIER, []rune("yearsPassed")},
+		{token.SEMICOLON, []rune(";")},
+		{token.RBRACE, []rune("}")},
+		{token.SEMICOLON, []rune(";")},
+
+		{token.VAR, []rune("var")},
+		{token.IDENTIFIER, []rune("newAge")},
+		{token.ASSIGNMENT, []rune("=")},
+		{token.IDENTIFIER, []rune("timeGoesBy")},
+		{token.LPAREN, []rune("(")},
+		{token.IDENTIFIER, []rune("age")},
+		{token.COMMA, []rune(",")},
+		{token.INT, []rune("1")},
+		{token.RPAREN, []rune(")")},
+		{token.SEMICOLON, []rune(";")},
+		{token.EOF, []rune("")},
 	}
 
 	lxr := lexer.New(input)
@@ -34,7 +65,7 @@ func TestNextToken(t *testing.T) {
 			t.Fatalf("tests[%d] - wrong token type. Expected=%v, got=%v", i, testToken.expectedType, token.Type)
 		}
 
-		if token.Literal != testToken.expectedLiteral {
+		if string(token.Literal) != string(testToken.expectedLiteral) {
 			t.Fatalf("tests[%d] - wrong token literal. Expected=%v, got=%v", i, testToken.expectedLiteral, token.Literal)
 		}
 	}

@@ -15,50 +15,45 @@ type Lexer struct {
 }
 
 func New(input string) *Lexer {
-	lxr := &Lexer{
-		input: []rune(input),
-	}
-
+	lxr := &Lexer{input: []rune(input)}
 	lxr.readChar()
-
 	return lxr
 }
 
 func (l *Lexer) NextToken() token.Token {
-	var tkn token.Token
+	tkn := token.Token{Literal: l.readNextToken()}
 
-	runeToTokenMap := map[rune]token.TokenType{
-		'=': token.ASSIGNMENT,
-		'+': token.PLUS,
-		'-': token.MINUS,
-		'*': token.MULTIPLY,
-		'/': token.DIVIDE,
-		'%': token.MODULUS,
-
-		'(': token.LPAREN,
-		')': token.RPAREN,
-		'{': token.LBRACE,
-		'}': token.RBRACE,
-
-		',': token.COMMA,
-		';': token.SEMICOLON,
-
-		0: token.EOF,
-	}
-
-	if tokenType, ok := runeToTokenMap[l.ch]; ok {
+	// handle empty literals, i.e. EOF, whitespace, newlines, tabs,	etc.
+	if len(tkn.Literal) == 0 {
 		if l.ch == 0 {
-			tkn = token.Token{Type: token.EOF, Literal: ""}
-		} else {
-			tkn = token.Token{Type: tokenType, Literal: string(l.ch)}
+			tkn.Type = token.EOF
+			goto getNextToken // where is your god now?
+		} else { // not EOF, just skip this token
+			l.readChar()
+			return l.NextToken()
 		}
-	} else {
-		tkn = token.Token{Type: token.ILLEGAL, Literal: string(l.ch)}
 	}
 
+	switch {
+	case token.IsDelimiter(tkn.Literal):
+		tkn.Type = token.Delimiters[rune(tkn.Literal[0])]
+	case token.IsOperator(tkn.Literal):
+		tkn.Type = token.Operators[rune(tkn.Literal[0])]
+	case token.IsKeyword(tkn.Literal):
+		tkn.Type = token.Keywords[string(tkn.Literal)]
+
+	case token.IsInteger(tkn.Literal):
+		tkn.Type = token.INT
+	case token.IsCharacter(tkn.Literal):
+		tkn.Type = token.CHAR
+
+	default:
+		tkn.Type = token.IDENTIFIER
+	}
+
+getNextToken:
 	l.readChar()
 	return tkn
-
 }
 
 func (l *Lexer) readChar() {
@@ -71,4 +66,31 @@ func (l *Lexer) readChar() {
 
 	l.position = l.readPosition
 	l.readPosition += 1
+}
+
+func (l *Lexer) readNextToken() []rune {
+	var word []rune
+
+	for l.ch != 0 {
+		if l.ch == ' ' || l.ch == '\n' || l.ch == '\t' {
+			break
+		}
+
+		if _, ok := token.Delimiters[l.ch]; ok {
+			// take a step back and process delimiter in the next iteration
+			if len(word) > 0 {
+				l.position -= 1
+				l.readPosition -= 1
+				break
+			}
+
+			word = append(word, l.ch)
+			break
+		}
+
+		word = append(word, l.ch)
+		l.readChar()
+	}
+
+	return word
 }
