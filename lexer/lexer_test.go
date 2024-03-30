@@ -14,12 +14,17 @@ var timeGoesBy = func(currentAge, yearsPassed) {
 };
 
 var newAge = timeGoesBy(age, 1);
-age < newAge;
-age <= newAge;
-age > newAge;
-age >= newAge;
-age == newAge;
-age != newAge;
+if (age < newAge) {
+	return (1 == 1);
+} else {
+	return (1 != 1);
+}
+
+var truthness = (age <= newAge) and (2 >= 1);
+var falseness = (age > newAge) or (2 < 1);
+
+var amIAlive = true and not false;
+
 `
 
 	tests := []struct {
@@ -61,34 +66,71 @@ age != newAge;
 		{token.RPAREN, []rune(")")},
 		{token.SEMICOLON, []rune(";")},
 
+		{token.IF, []rune("if")},
+		{token.LPAREN, []rune("(")},
 		{token.IDENTIFIER, []rune("age")},
 		{token.LESS_THAN, []rune("<")},
 		{token.IDENTIFIER, []rune("newAge")},
+		{token.RPAREN, []rune(")")},
+		{token.LBRACE, []rune("{")},
+		{token.RETURN, []rune("return")},
+		{token.LPAREN, []rune("(")},
+		{token.INT, []rune("1")},
+		{token.EQUAL, []rune("==")},
+		{token.INT, []rune("1")},
+		{token.RPAREN, []rune(")")},
 		{token.SEMICOLON, []rune(";")},
+		{token.RBRACE, []rune("}")},
+		{token.ELSE, []rune("else")},
+		{token.LBRACE, []rune("{")},
+		{token.RETURN, []rune("return")},
+		{token.LPAREN, []rune("(")},
+		{token.INT, []rune("1")},
+		{token.NOT_EQUAL, []rune("!=")},
+		{token.INT, []rune("1")},
+		{token.RPAREN, []rune(")")},
+		{token.SEMICOLON, []rune(";")},
+		{token.RBRACE, []rune("}")},
 
+		{token.VAR, []rune("var")},
+		{token.IDENTIFIER, []rune("truthness")},
+		{token.ASSIGNMENT, []rune("=")},
+		{token.LPAREN, []rune("(")},
 		{token.IDENTIFIER, []rune("age")},
 		{token.LESS_THAN_OR_EQUAL, []rune("<=")},
 		{token.IDENTIFIER, []rune("newAge")},
+		{token.RPAREN, []rune(")")},
+		{token.AND, []rune("and")},
+		{token.LPAREN, []rune("(")},
+		{token.INT, []rune("2")},
+		{token.GREATER_THAN_OR_EQUAL, []rune(">=")},
+		{token.INT, []rune("1")},
+		{token.RPAREN, []rune(")")},
 		{token.SEMICOLON, []rune(";")},
 
+		{token.VAR, []rune("var")},
+		{token.IDENTIFIER, []rune("falseness")},
+		{token.ASSIGNMENT, []rune("=")},
+		{token.LPAREN, []rune("(")},
 		{token.IDENTIFIER, []rune("age")},
 		{token.GREATER_THAN, []rune(">")},
 		{token.IDENTIFIER, []rune("newAge")},
+		{token.RPAREN, []rune(")")},
+		{token.OR, []rune("or")},
+		{token.LPAREN, []rune("(")},
+		{token.INT, []rune("2")},
+		{token.LESS_THAN, []rune("<")},
+		{token.INT, []rune("1")},
+		{token.RPAREN, []rune(")")},
 		{token.SEMICOLON, []rune(";")},
 
-		{token.IDENTIFIER, []rune("age")},
-		{token.GREATER_THAN_OR_EQUAL, []rune(">=")},
-		{token.IDENTIFIER, []rune("newAge")},
-		{token.SEMICOLON, []rune(";")},
-
-		{token.IDENTIFIER, []rune("age")},
-		{token.EQUAL, []rune("==")},
-		{token.IDENTIFIER, []rune("newAge")},
-		{token.SEMICOLON, []rune(";")},
-
-		{token.IDENTIFIER, []rune("age")},
-		{token.NOT_EQUAL, []rune("!=")},
-		{token.IDENTIFIER, []rune("newAge")},
+		{token.VAR, []rune("var")},
+		{token.IDENTIFIER, []rune("amIAlive")},
+		{token.ASSIGNMENT, []rune("=")},
+		{token.TRUE, []rune("true")},
+		{token.AND, []rune("and")},
+		{token.NOT, []rune("not")},
+		{token.FALSE, []rune("false")},
 		{token.SEMICOLON, []rune(";")},
 
 		{token.EOF, []rune("")},

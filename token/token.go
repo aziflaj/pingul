@@ -14,7 +14,7 @@ const (
 	EOF
 
 	// Identifiers & Literals
-	IDENTIFIER // 2
+	IDENTIFIER
 	INT
 	CHAR
 
@@ -34,9 +34,11 @@ const (
 	GREATER_THAN_OR_EQUAL
 	LESS_THAN_OR_EQUAL
 
+	// Logical
+
 	// Delimiters
 	COMMA
-	SEMICOLON //12
+	SEMICOLON
 
 	LPAREN
 	RPAREN
@@ -44,15 +46,31 @@ const (
 	RBRACE
 
 	// Keywords
-	VAR // 17
+	NIL
+	VAR
 	FUNC
 	RETURN
+	TRUE
+	FALSE
+	AND
+	OR
+	NOT
+	IF
+	ELSE
 )
 
 var Keywords = map[string]TokenType{
+	"nil":    NIL,
 	"var":    VAR,
 	"func":   FUNC,
 	"return": RETURN,
+	"true":   TRUE,
+	"false":  FALSE,
+	"and":    AND,
+	"or":     OR,
+	"not":    NOT,
+	"if":     IF,
+	"else":   ELSE,
 }
 
 var Delimiters = map[rune]TokenType{
