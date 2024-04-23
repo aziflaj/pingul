@@ -18,7 +18,7 @@ const (
 	LGT     // less, greater than, lte, gte
 	SUM     // +
 	PRODUCT // *
-	PREFIX  // `-x`, `or x`
+	PREFIX  // `-x`, `not x`
 	FUNCALL // function call
 )
 
@@ -49,6 +49,8 @@ func New(lxr *lexer.Lexer) *Parser {
 	p.prefixParseHandlers = map[token.TokenType]prefixParseHandler{
 		token.IDENTIFIER: p.parseIdentifier,
 		token.INT:        p.parseIntegerLiteral,
+		token.NOT:        p.parsePrefixExpression,
+		// token.MINUS:      p.parsePrefixExpression,
 	}
 
 	return p
@@ -157,6 +159,8 @@ func (p *Parser) parseExpression(op OpPrecedence) ast.Expression {
 	prefixHandler := p.prefixParseHandlers[p.currentToken.Type]
 
 	if prefixHandler == nil {
+		msg := fmt.Sprintf("No prefix parse function for %s found", p.currentToken)
+		p.errors = append(p.errors, msg)
 		return nil
 	}
 
@@ -176,4 +180,16 @@ func (p *Parser) parseIntegerLiteral() ast.Expression {
 	}
 
 	return &ast.IntegerLiteral{Token: p.currentToken, Value: val}
+}
+
+func (p *Parser) parsePrefixExpression() ast.Expression {
+	expr := &ast.PrefixExpression{
+		Token:    p.currentToken,
+		Operator: string(p.currentToken.Literal),
+	}
+
+	p.nextToken()
+	expr.Right = p.parseExpression(PREFIX)
+
+	return expr
 }

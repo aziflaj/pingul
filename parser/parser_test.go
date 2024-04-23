@@ -1,6 +1,7 @@
 package parser_test
 
 import (
+	"strconv"
 	"testing"
 
 	"github.com/aziflaj/pingul/ast"
@@ -191,6 +192,47 @@ func TestParseIntegerLiterals(t *testing.T) {
 	}
 }
 
+func TestParsePrefixExpressions(t *testing.T) {
+	testCases := []struct {
+		input    string
+		operator string
+		value    interface{}
+	}{
+		{"not 5;", "not", 5},
+		// {"-15;", "-", 15},
+		// {"not true;", "not", "true"},
+	}
+
+	for _, tc := range testCases {
+		lxr := lexer.New(tc.input)
+		p := parser.New(lxr)
+		program := p.ParseProgram()
+
+		assertProgram(t, program)
+		checkParserErrors(t, p)
+		assertProgramLength(t, program, 1)
+
+		exprStmt, ok := program.Statements[0].(*ast.ExpressionStatement)
+		if !ok {
+			t.Fatalf("program.Statements[0] is not *ast.ExpressionStatement. Got=%T",
+				program.Statements[0])
+		}
+
+		prefixExpr, ok := exprStmt.Expression.(*ast.PrefixExpression)
+		if !ok {
+			t.Fatalf("expression is not *ast.PrefixExpression. Got=%T", exprStmt.Expression)
+		}
+
+		if string(prefixExpr.Operator) != tc.operator {
+			t.Errorf("prefixExpr.Operator not '%s'. Got=%v", tc.operator, string(prefixExpr.Operator))
+		}
+
+		if !testLiteralExpression(t, prefixExpr.Right, tc.value) {
+			return
+		}
+	}
+}
+
 // Helper functions
 
 func testVarStatement(t *testing.T, s ast.Statement, name string) bool {
@@ -213,6 +255,59 @@ func testVarStatement(t *testing.T, s ast.Statement, name string) bool {
 
 	if string(varStmt.Name.TokenLiteral()) != name {
 		t.Errorf("varStmt.Name.Value not '%s'. Got=%v", name, string(varStmt.Name.Value))
+		return false
+	}
+
+	return true
+}
+
+func testLiteralExpression(t *testing.T, expr ast.Expression, expected interface{}) bool {
+	switch v := expected.(type) {
+	case int:
+		return testIntegerLiteral(t, expr, int64(v))
+	case string:
+		return testIdentifier(t, expr, v)
+	}
+
+	t.Errorf("type of expr not handled. Got=%T", expr)
+	return false
+}
+
+func testIntegerLiteral(t *testing.T, il ast.Expression, value int64) bool {
+	intExpr, ok := il.(*ast.IntegerLiteral)
+	if !ok {
+		t.Errorf("il not *ast.IntegerLiteral. Got=%T", il)
+		return false
+	}
+
+	if intExpr.Value != value {
+		t.Errorf("intExpr.Value not %d. Got=%d", value, intExpr.Value)
+		return false
+	}
+
+	if string(intExpr.TokenLiteral()) != strconv.Itoa(int(value)) {
+		t.Errorf("intExpr.TokenLiteral not %d. Got=%v", value, string(intExpr.TokenLiteral()))
+		return false
+	}
+
+	return true
+}
+
+func testIdentifier(t *testing.T, expr ast.Expression, value string) bool {
+	identExpr, ok := expr.(*ast.Identifier)
+	if !ok {
+		t.Errorf("expr not *ast.Identifier. Got=%T", expr)
+		return false
+	}
+
+	if string(identExpr.Value) != value {
+		t.Errorf("identExpr.Value not %s. Got=%v", value, string(identExpr.Value))
+		return false
+	}
+
+	if string(identExpr.TokenLiteral()) != value {
+		t.Errorf("identExpr.TokenLiteral not %s. Got=%v",
+			value, string(identExpr.TokenLiteral()))
 		return false
 	}
 
