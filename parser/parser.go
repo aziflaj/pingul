@@ -69,6 +69,7 @@ func New(lxr *lexer.Lexer) *Parser {
 		token.MINUS:      p.parsePrefixExpression,
 		token.TRUE:       p.parseBoolean,
 		token.FALSE:      p.parseBoolean,
+		token.LPAREN:     p.parseGroupExpressions,
 	}
 
 	p.infixParseHandlers = map[token.TokenType]infixParseHandler{
@@ -210,8 +211,6 @@ func (p *Parser) parseExpression(op OpPrecedence) ast.Expression {
 	prefixHandler := p.prefixParseHandlers[p.currentToken.Type]
 
 	if prefixHandler == nil {
-		msg := fmt.Sprintf("No prefix parse function for %s found", p.currentToken)
-		p.errors = append(p.errors, msg)
 		return nil
 	}
 	leftExpr := prefixHandler()
@@ -275,4 +274,16 @@ func (p *Parser) parseBoolean() ast.Expression {
 		Token: p.currentToken,
 		Value: p.currentToken.Type == token.TRUE,
 	}
+}
+
+func (p *Parser) parseGroupExpressions() ast.Expression {
+	p.nextToken()
+
+	parsedExpr := p.parseExpression(LOWEST)
+
+	if p.peekToken.Type != token.RPAREN {
+		return nil
+	}
+
+	return parsedExpr
 }

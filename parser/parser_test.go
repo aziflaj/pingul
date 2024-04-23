@@ -295,14 +295,23 @@ func TestOperatorPrecedenceParsing(t *testing.T) {
 		{"false", "false"},
 		{"3 > 5 == false", "((3 > 5) == false)"},
 		{"3 < 5 == true", "((3 < 5) == true)"},
+		{"3 * (2 - 6)", "(3 * (2 - 6))"},
+		{"b / (a + c)", "(b / (a + c))"},
+		{"not (a + b)", "(not((a + b)))"},
+		{"not a + b", "((not(a)) + b)"},
+		{"a + not b", "(a + (not(b)))"},
+		{"not (true == false)", "(not((true == false)))"},
 	}
 
-	for _, tt := range tests {
+	for index, tt := range tests {
 		l := lexer.New(tt.input)
 		p := parser.New(l)
 		program := p.ParseProgram()
+
+		t.Logf("Test %d: %s", index, tt.input)
 		checkParserErrors(t, p)
 		actual := program.String()
+
 		if actual != tt.expected {
 			t.Errorf("expected=%q, got=%q", tt.expected, actual)
 		}
