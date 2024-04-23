@@ -1,8 +1,12 @@
-# pingul
+# PinguL
 
-According to Github Copilot, Pingul is a penguin. I'm not sure if that's true, but I'm going to trust it.
+PinguL (short for PinguLang) is a programming language that I'm creating for fun.
 
-According to me, it's a Work in Progress interpreter. For now, it only has a Lexer and can parse this piece of code:
+![pingu](https://github.com/aziflaj/pingul/assets/5219775/6de2c555-1237-41ca-95fd-18349d2d247f)
+
+
+It's a work in progress and I'm not sure what it will look like in the end. For now, I'm just trying to make it work.
+It should look like a mix of Python and JavaScript, sorta like this:
 
 ```js
 var age = 28;
@@ -22,4 +26,3 @@ var falseness = (age > newAge) or (2 < 1);
 
 var amIAlive = true and not false;
 ```
-

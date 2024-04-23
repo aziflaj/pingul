@@ -27,7 +27,7 @@ func (l *Lexer) NextToken() token.Token {
 	if len(tkn.Literal) == 0 {
 		if l.ch == 0 {
 			tkn.Type = token.EOF
-			goto getNextToken // where is your god now?
+			goto getNextToken // goto statement in action. where is your god now?
 		} else { // not EOF, just skip this token
 			l.readChar()
 			return l.NextToken()
@@ -46,8 +46,9 @@ func (l *Lexer) NextToken() token.Token {
 
 	case token.IsInteger(tkn.Literal):
 		tkn.Type = token.INT
-	case token.IsCharacter(tkn.Literal):
-		tkn.Type = token.CHAR
+	// TODO: Chars should be inside quotes
+	// case token.IsCharacter(tkn.Literal):
+	// 	tkn.Type = token.CHAR
 
 	default:
 		tkn.Type = token.IDENTIFIER
@@ -76,6 +77,19 @@ func (l *Lexer) readNextToken() []rune {
 	for l.ch != 0 {
 		if l.ch == ' ' || l.ch == '\n' || l.ch == '\t' {
 			break
+		}
+
+		// check if current character is an unary operator
+		if _, ok := token.UnaryOperators[l.ch]; ok {
+			// take a step back and process unary operator in the next iteration
+			if len(word) > 0 {
+				l.position -= 1
+				l.readPosition -= 1
+				break
+			} else {
+				word = append(word, l.ch)
+				break
+			}
 		}
 
 		if _, ok := token.Delimiters[l.ch]; ok {

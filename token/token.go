@@ -10,7 +10,7 @@ type Token struct {
 }
 
 const (
-	ILLEGAL = iota
+	ILLEGAL = TokenType(iota)
 	EOF
 
 	// Identifiers & Literals
@@ -33,8 +33,6 @@ const (
 	LESS_THAN
 	GREATER_THAN_OR_EQUAL
 	LESS_THAN_OR_EQUAL
-
-	// Logical
 
 	// Delimiters
 	COMMA
@@ -80,6 +78,10 @@ var Delimiters = map[rune]TokenType{
 	'}': RBRACE,
 	',': COMMA,
 	';': SEMICOLON,
+}
+
+var UnaryOperators = map[rune]TokenType{
+	'-': MINUS,
 }
 
 var Operators = map[rune]TokenType{
@@ -146,5 +148,42 @@ func IsKeyword(literal []rune) bool {
 }
 
 func (t Token) String() string {
-	return fmt.Sprintf("Token(%v, '%v')", t.Type, string(t.Literal))
+	types := map[TokenType]string{
+		ILLEGAL:               "ILLEGAL",
+		EOF:                   "EOF",
+		IDENTIFIER:            "IDENTIFIER",
+		INT:                   "INT",
+		CHAR:                  "CHAR",
+		ASSIGNMENT:            "=",
+		PLUS:                  "+",
+		MINUS:                 "-",
+		MULTIPLY:              "*",
+		DIVIDE:                "/",
+		MODULUS:               "%",
+		EQUAL:                 "==",
+		NOT_EQUAL:             "!=",
+		GREATER_THAN:          ">",
+		LESS_THAN:             "<",
+		GREATER_THAN_OR_EQUAL: ">=",
+		LESS_THAN_OR_EQUAL:    "<=",
+		COMMA:                 ",",
+		SEMICOLON:             ";",
+		LPAREN:                "(",
+		RPAREN:                ")",
+		LBRACE:                "{",
+		RBRACE:                "}",
+		NIL:                   "nil",
+		VAR:                   "var",
+		FUNC:                  "func",
+		RETURN:                "return",
+		TRUE:                  "true",
+		FALSE:                 "false",
+		AND:                   "and",
+		OR:                    "or",
+		NOT:                   "not",
+		IF:                    "if",
+		ELSE:                  "else",
+	}
+
+	return fmt.Sprintf("Token(%v, '%v')", types[t.Type], string(t.Literal))
 }
