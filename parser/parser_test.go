@@ -19,14 +19,8 @@ var result = 10 * (20 / 2);
 	p := parser.New(lxr)
 	program := p.ParseProgram()
 
-	if program == nil {
-		t.Fatalf("ParseProgram() returned nil")
-	}
-
-	if len(program.Statements) != 3 {
-		t.Fatalf("program.Statements does not contain 3 statements. Got=%d",
-			len(program.Statements))
-	}
+	assertProgram(t, program)
+	assertProgramLength(t, program, 3)
 
 	testCases := []struct {
 		expectedIdentifier string
@@ -51,14 +45,7 @@ func TestParseErrors(t *testing.T) {
 	p := parser.New(lxr)
 	program := p.ParseProgram()
 
-	if program == nil {
-		t.Fatalf("ParseProgram() returned nil")
-	}
-
-	if len(program.Statements) != 2 {
-		t.Fatalf("program.Statements does not contain 2 statements. Got=%d",
-			len(program.Statements))
-	}
+	assertProgram(t, program)
 
 	testCases := []struct {
 		expectedIdentifier string
@@ -93,23 +80,15 @@ func TestParseErrors(t *testing.T) {
 func TestReturnStatements(t *testing.T) {
 	input := `return 5;
 return fubar;
-
-return func() {
-	return 5;
-};
+return if (power > 9000) { "strong" } else { "weak" };
 `
 
 	lxr := lexer.New(input)
 	p := parser.New(lxr)
 	program := p.ParseProgram()
-	if program == nil {
-		t.Fatalf("ParseProgram() returned nil")
-	}
 
-	if len(program.Statements) != 3 {
-		t.Fatalf("program.Statements does not contain 3 statements. Got=%d",
-			len(program.Statements))
-	}
+	assertProgram(t, program)
+	assertProgramLength(t, program, 3)
 
 	for _, stmt := range program.Statements {
 		// assert type
@@ -150,6 +129,70 @@ func TestStringifiedProgram(t *testing.T) {
 	}
 }
 
+func TestParseIdentifiers(t *testing.T) {
+	input := `username;`
+
+	lxr := lexer.New(input)
+	p := parser.New(lxr)
+	program := p.ParseProgram()
+
+	assertProgram(t, program)
+	assertProgramLength(t, program, 1)
+
+	exprStmt, ok := program.Statements[0].(*ast.ExpressionStatement)
+	if !ok {
+		t.Fatalf("program.Statements[0] is not *ast.ExpressionStatement. Got=%T",
+			program.Statements[0])
+	}
+
+	identExpr, ok := exprStmt.Expression.(*ast.Identifier)
+	if !ok {
+		t.Fatalf("expression is not *ast.Identifier. Got=%T", exprStmt.Expression)
+	}
+
+	if string(identExpr.Value) != "username" {
+		t.Errorf("identExpr.Value not 'username'. Got=%v", string(identExpr.Value))
+	}
+
+	if string(identExpr.TokenLiteral()) != "username" {
+		t.Errorf("identExpr.TokenLiteral not 'username'. Got=%v",
+			string(identExpr.TokenLiteral()))
+	}
+}
+
+func TestParseIntegerLiterals(t *testing.T) {
+	input := `69420`
+
+	lxr := lexer.New(input)
+	p := parser.New(lxr)
+	program := p.ParseProgram()
+
+	assertProgram(t, program)
+	assertProgramLength(t, program, 1)
+
+	exprStmt, ok := program.Statements[0].(*ast.ExpressionStatement)
+	if !ok {
+		t.Fatalf("program.Statements[0] is not *ast.ExpressionStatement. Got=%T",
+			program.Statements[0])
+	}
+
+	intExpr, ok := exprStmt.Expression.(*ast.IntegerLiteral)
+	if !ok {
+		t.Fatalf("expression is not *ast.IntegerLiteral. Got=%T", exprStmt.Expression)
+	}
+
+	if intExpr.Value != 69420 {
+		t.Errorf("intExpr.Value not '69420'. Got=%v", intExpr.Value)
+	}
+
+	if string(intExpr.TokenLiteral()) != "69420" {
+		t.Errorf("intExpr.TokenLiteral not '69420'. Got=%v",
+			string(intExpr.TokenLiteral()))
+	}
+}
+
+// Helper functions
+
 func testVarStatement(t *testing.T, s ast.Statement, name string) bool {
 	if string(s.TokenLiteral()) != "var" {
 		t.Errorf("s.TokenLiteral not 'var'. Got=%q", s.TokenLiteral())
@@ -185,5 +228,18 @@ func checkParserErrors(t *testing.T, p *parser.Parser) {
 	t.Errorf("Parser has %d errors", len(errors))
 	for _, msg := range errors {
 		t.Errorf("Parser error: %q", msg)
+	}
+}
+
+func assertProgram(t *testing.T, program *ast.Program) {
+	if program == nil {
+		t.Fatalf("Program is unparsable")
+	}
+}
+
+func assertProgramLength(t *testing.T, program *ast.Program, expected int) {
+	if len(program.Statements) != expected {
+		t.Fatalf("program.Statements does not contain %d statements. Got=%d",
+			expected, len(program.Statements))
 	}
 }

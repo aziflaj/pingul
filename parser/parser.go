@@ -2,10 +2,29 @@ package parser
 
 import (
 	"fmt"
+	"strconv"
 
 	"github.com/aziflaj/pingul/ast"
 	"github.com/aziflaj/pingul/lexer"
 	"github.com/aziflaj/pingul/token"
+)
+
+// Operator Predecence levels
+type OpPrecedence uint8
+
+const (
+	LOWEST  = OpPrecedence(iota)
+	EQUALS  // ==
+	LGT     // less, greater than, lte, gte
+	SUM     // +
+	PRODUCT // *
+	PREFIX  // `-x`, `or x`
+	FUNCALL // function call
+)
+
+type (
+	prefixParseHandler func() ast.Expression
+	infixParseHandler  func(ast.Expression) ast.Expression
 )
 
 type Parser struct {
@@ -15,6 +34,9 @@ type Parser struct {
 	peekToken    token.Token
 
 	errors []string
+
+	prefixParseHandlers map[token.TokenType]prefixParseHandler
+	infixParseHandlers  map[token.TokenType]infixParseHandler
 }
 
 func New(lxr *lexer.Lexer) *Parser {
@@ -23,6 +45,11 @@ func New(lxr *lexer.Lexer) *Parser {
 	// set both currentToken and peekToken
 	p.nextToken()
 	p.nextToken()
+
+	p.prefixParseHandlers = map[token.TokenType]prefixParseHandler{
+		token.IDENTIFIER: p.parseIdentifier,
+		token.INT:        p.parseIntegerLiteral,
+	}
 
 	return p
 }
@@ -63,13 +90,11 @@ func (p *Parser) parseStatement() ast.Statement {
 		return p.parseReturnStatement()
 
 	default:
-		return nil
+		return p.parseExpressionStatement()
 	}
 }
 
 func (p *Parser) parseVarStatement() *ast.VarStatement {
-	// fmt.Println("Parsing var statement")
-	// fmt.Println("Current token:", p.currentToken)
 	stmt := &ast.VarStatement{Token: p.currentToken}
 
 	if p.peekToken.Type != token.IDENTIFIER {
@@ -95,8 +120,6 @@ func (p *Parser) parseVarStatement() *ast.VarStatement {
 }
 
 func (p *Parser) parseReturnStatement() *ast.ReturnStatement {
-	// fmt.Println("Parsing return statement")
-	// fmt.Println("Current token:", p.currentToken)
 	stmt := &ast.ReturnStatement{Token: p.currentToken}
 
 	// TODO: parse the expression
@@ -109,8 +132,48 @@ func (p *Parser) parseReturnStatement() *ast.ReturnStatement {
 	return stmt
 }
 
+func (p *Parser) parseExpressionStatement() *ast.ExpressionStatement {
+	stmt := &ast.ExpressionStatement{
+		Token:      p.currentToken,
+		Expression: p.parseExpression(LOWEST),
+	}
+
+	if p.peekToken.Type == token.SEMICOLON {
+		p.nextToken()
+	}
+
+	return stmt
+}
+
+// Helpers
+
 func (p *Parser) peekError(expected token.Token) {
 	msg := fmt.Sprintf("Expected next token to be %s, got %s instead",
 		expected, p.peekToken)
 	p.errors = append(p.errors, msg)
+}
+
+func (p *Parser) parseExpression(op OpPrecedence) ast.Expression {
+	prefixHandler := p.prefixParseHandlers[p.currentToken.Type]
+
+	if prefixHandler == nil {
+		return nil
+	}
+
+	return prefixHandler()
+}
+
+func (p *Parser) parseIdentifier() ast.Expression {
+	return &ast.Identifier{Token: p.currentToken, Value: p.currentToken.Literal}
+}
+
+func (p *Parser) parseIntegerLiteral() ast.Expression {
+	val, err := strconv.ParseInt(string(p.currentToken.Literal), 0, 64)
+	if err != nil {
+		msg := fmt.Sprintf("Could not parse %q as integer", p.currentToken.Literal)
+		p.errors = append(p.errors, msg)
+		return nil
+	}
+
+	return &ast.IntegerLiteral{Token: p.currentToken, Value: val}
 }
