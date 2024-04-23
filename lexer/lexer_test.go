@@ -23,9 +23,7 @@ if (age < newAge) {
 var truthness = (age <= newAge) and (2 >= 1);
 var falseness = (age > newAge) or (2 < 1);
 
-var amIAlive = true and not false;
-
-`
+var amIAlive = true and not false;`
 
 	tests := []struct {
 		expectedType    token.TokenType
