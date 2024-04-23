@@ -70,6 +70,7 @@ func New(lxr *lexer.Lexer) *Parser {
 		token.TRUE:       p.parseBoolean,
 		token.FALSE:      p.parseBoolean,
 		token.LPAREN:     p.parseGroupExpressions,
+		token.IF:         p.parseIfExpression,
 	}
 
 	p.infixParseHandlers = map[token.TokenType]infixParseHandler{
@@ -286,4 +287,62 @@ func (p *Parser) parseGroupExpressions() ast.Expression {
 	}
 
 	return parsedExpr
+}
+
+func (p *Parser) parseIfExpression() ast.Expression {
+	expr := &ast.IfExpression{Token: p.currentToken}
+
+	if p.peekToken.Type != token.LPAREN {
+		p.errors = append(p.errors, "Expected '(' after 'if'")
+		return nil
+	}
+
+	p.nextToken()
+	expr.Condition = p.parseExpression(LOWEST)
+
+	if p.peekToken.Type != token.RPAREN {
+		p.errors = append(p.errors, "Expected ')' after condition")
+		return nil
+	}
+	p.nextToken()
+
+	if p.peekToken.Type != token.LBRACE {
+		p.errors = append(p.errors, "Expected '{' after condition")
+		return nil
+	}
+
+	p.nextToken()
+	expr.Consequence = p.parseBlockStatement()
+
+	if p.peekToken.Type == token.ELSE {
+		p.nextToken()
+
+		if p.peekToken.Type != token.LBRACE {
+			p.errors = append(p.errors, "Expected '{' after 'else'")
+			return nil
+		}
+
+		p.nextToken()
+		expr.Alternative = p.parseBlockStatement()
+	}
+
+	return expr
+}
+
+func (p *Parser) parseBlockStatement() *ast.BlockStatement {
+	block := &ast.BlockStatement{Token: p.currentToken}
+
+	p.nextToken()
+	// read until the end of the block
+	for p.currentToken.Type != token.RBRACE {
+		stmt := p.parseStatement()
+
+		if stmt != nil {
+			block.Statements = append(block.Statements, stmt)
+		}
+
+		p.nextToken()
+	}
+
+	return block
 }

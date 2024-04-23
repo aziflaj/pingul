@@ -318,7 +318,66 @@ func TestOperatorPrecedenceParsing(t *testing.T) {
 	}
 }
 
-// Helper functions
+func TestIfExpressions(t *testing.T) {
+	input := `if (x > y) { true } else { false }`
+
+	lxr := lexer.New(input)
+	p := parser.New(lxr)
+	program := p.ParseProgram()
+	assertProgram(t, program)
+	checkParserErrors(t, p)
+	assertProgramLength(t, program, 1)
+
+	stmt, ok := program.Statements[0].(*ast.ExpressionStatement)
+	if !ok {
+		t.Fatalf("program.Statements[0] is not *ast.ExpressionStatement. Got=%T",
+			program.Statements[0])
+	}
+
+	ifExpr, ok := stmt.Expression.(*ast.IfExpression)
+	if !ok {
+		t.Fatalf("stmt.Expression is not *ast.IfExpression. Got=%T", stmt.Expression)
+	}
+
+	if !testInfixExpression(t, ifExpr.Condition, "x", ">", "y") {
+		return
+	}
+
+	if len(ifExpr.Consequence.Statements) != 1 {
+		for _, s := range ifExpr.Consequence.Statements {
+			t.Logf("Statement: %s", s.String())
+		}
+		t.Errorf("Consequence does not have 1 statement. Got=%d",
+			len(ifExpr.Consequence.Statements))
+	}
+
+	consequence, ok := ifExpr.Consequence.Statements[0].(*ast.ExpressionStatement)
+	if !ok {
+		t.Fatalf("Consequence.Statements[0] is not *ast.ExpressionStatement. Got=%T",
+			ifExpr.Consequence.Statements[0])
+	}
+
+	if !testBoolean(t, consequence.Expression, true) {
+		return
+	}
+
+	if len(ifExpr.Alternative.Statements) != 1 {
+		t.Errorf("Alternative does not have 1 statement. Got=%d",
+			len(ifExpr.Alternative.Statements))
+	}
+
+	alternative, ok := ifExpr.Alternative.Statements[0].(*ast.ExpressionStatement)
+	if !ok {
+		t.Fatalf("Alternative.Statements[0] is not *ast.ExpressionStatement. Got=%T",
+			ifExpr.Alternative.Statements[0])
+	}
+
+	if !testBoolean(t, alternative.Expression, false) {
+		return
+	}
+}
+
+///////// Helper functions /////////
 
 func testVarStatement(t *testing.T, s ast.Statement, name string) bool {
 	if string(s.TokenLiteral()) != "var" {
@@ -471,4 +530,9 @@ func assertProgramLength(t *testing.T, program *ast.Program, expected int) {
 		t.Fatalf("program.Statements does not contain %d statements. Got=%d",
 			expected, len(program.Statements))
 	}
+
+	for _, stmt := range program.Statements {
+		t.Logf("Statement: %s", stmt.String())
+	}
+
 }

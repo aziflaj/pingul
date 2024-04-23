@@ -93,3 +93,25 @@ func (s *ExpressionStatement) String() string {
 
 	return ""
 }
+
+// { <statement> ... }
+type BlockStatement struct {
+	Token      token.Token // the { token
+	Statements []Statement
+}
+
+func (b *BlockStatement) statementNode() {}
+func (b *BlockStatement) TokenLiteral() []rune {
+	return b.Token.Literal
+}
+func (ss *BlockStatement) String() string {
+	var b strings.Builder
+
+	b.WriteString("{")
+	for _, s := range ss.Statements {
+		b.WriteString(s.String())
+	}
+	b.WriteString("}")
+
+	return b.String()
+}

@@ -83,3 +83,31 @@ func (i *InfixExpression) String() string {
 
 	return b.String()
 }
+
+// if (<expression>) <block> else <block>
+type IfExpression struct {
+	Token       token.Token // the 'if' token
+	Condition   Expression
+	Consequence *BlockStatement
+	Alternative *BlockStatement
+}
+
+func (i *IfExpression) expressionNode() {}
+func (i *IfExpression) TokenLiteral() []rune {
+	return i.Token.Literal
+}
+func (i *IfExpression) String() string {
+	var b strings.Builder
+
+	b.WriteString("if ")
+	b.WriteString(i.Condition.String())
+	b.WriteString(" ")
+	b.WriteString(i.Consequence.String())
+
+	if i.Alternative != nil {
+		b.WriteString(" else ")
+		b.WriteString(i.Alternative.String())
+	}
+
+	return b.String()
+}
