@@ -89,6 +89,42 @@ func TestParseErrors(t *testing.T) {
 	}
 }
 
+func TestReturnStatements(t *testing.T) {
+	input := `return 5;
+return fubar;
+
+return func() {
+	return 5;
+};
+`
+
+	lxr := lexer.New(input)
+	p := parser.New(lxr)
+	program := p.ParseProgram()
+	if program == nil {
+		t.Fatalf("ParseProgram() returned nil")
+	}
+
+	if len(program.Statements) != 3 {
+		t.Fatalf("program.Statements does not contain 3 statements. Got=%d",
+			len(program.Statements))
+	}
+
+	for _, stmt := range program.Statements {
+		// assert type
+		retStmt, ok := stmt.(*ast.ReturnStatement)
+		if !ok {
+			t.Errorf("stmt not *ast.ReturnStatement. Got=%T", stmt)
+			continue
+		}
+
+		if string(retStmt.TokenLiteral()) != "return" {
+			t.Errorf("retStmt.TokenLiteral not 'return'. Got=%q",
+				retStmt.TokenLiteral())
+		}
+	}
+}
+
 func testVarStatement(t *testing.T, s ast.Statement, name string) bool {
 	if string(s.TokenLiteral()) != "var" {
 		t.Errorf("s.TokenLiteral not 'var'. Got=%q", s.TokenLiteral())

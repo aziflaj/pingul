@@ -58,6 +58,10 @@ func (p *Parser) parseStatement() ast.Statement {
 	switch p.currentToken.Type {
 	case token.VAR:
 		return p.parseVarStatement()
+
+	case token.RETURN:
+		return p.parseReturnStatement()
+
 	default:
 		return nil
 	}
@@ -79,6 +83,21 @@ func (p *Parser) parseVarStatement() *ast.VarStatement {
 		p.peekError(token.Token{Type: token.ASSIGNMENT})
 		return nil
 	}
+
+	// TODO: parse the expression
+
+	// read until the end of the statement
+	for p.currentToken.Type != token.SEMICOLON {
+		p.nextToken()
+	}
+
+	return stmt
+}
+
+func (p *Parser) parseReturnStatement() *ast.ReturnStatement {
+	fmt.Println("Parsing return statement")
+	fmt.Println("Current token:", p.currentToken)
+	stmt := &ast.ReturnStatement{Token: p.currentToken}
 
 	// TODO: parse the expression
 

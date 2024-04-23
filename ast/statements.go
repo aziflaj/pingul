@@ -28,3 +28,14 @@ func (s *VarStatement) TokenLiteral() []rune {
 	fmt.Println(s.Token)
 	return s.Token.Literal
 }
+
+// return <expression>;
+type ReturnStatement struct {
+	Token       token.Token // the token.RETURN token
+	ReturnValue Expression
+}
+
+func (s *ReturnStatement) statementNode() {}
+func (s *ReturnStatement) TokenLiteral() []rune {
+	return s.Token.Literal
+}
