@@ -1,8 +1,9 @@
 # PinguL
 
-PinguL (short for Pingu Language) is a programming language that I'm creating for fun.
+PinguL (short for PinguLang) is a programming language that I'm creating for fun.
 
-![](https://tenor.com/bX2HI.gif)
+![pingu](https://github.com/aziflaj/pingul/assets/5219775/6de2c555-1237-41ca-95fd-18349d2d247f)
+
 
 It's a work in progress and I'm not sure what it will look like in the end. For now, I'm just trying to make it work.
 It should look like a mix of Python and JavaScript, sorta like this:
