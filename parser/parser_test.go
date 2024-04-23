@@ -301,6 +301,11 @@ func TestOperatorPrecedenceParsing(t *testing.T) {
 		{"not a + b", "((not(a)) + b)"},
 		{"a + not b", "(a + (not(b)))"},
 		{"not (true == false)", "(not((true == false)))"},
+		{"fib(5)", "fib(5)"},
+		{"fib(5) + 10", "(fib(5) + 10)"},
+		{"fib(5, fib(4))", "fib(5, fib(4))"},
+		{"fib(5, fib(4), fib(3 + (2 + 1))", "fib(5, fib(4), fib((3 + (2 + 1))))"},
+		{"add(a + b + c * d / f + g)", "add((((a + b) + ((c * d) / f)) + g))"},
 	}
 
 	for index, tt := range tests {
@@ -471,6 +476,40 @@ func TestFuncParams(t *testing.T) {
 			}
 		}
 	}
+}
+
+func TestCallExpressions(t *testing.T) {
+	input := `add(1, 2 * 3, 4 + 5);`
+
+	lxr := lexer.New(input)
+	p := parser.New(lxr)
+	program := p.ParseProgram()
+	assertProgram(t, program)
+	checkParserErrors(t, p)
+	assertProgramLength(t, program, 1)
+
+	stmt, ok := program.Statements[0].(*ast.ExpressionStatement)
+	if !ok {
+		t.Fatalf("program.Statements[0] is not *ast.ExpressionStatement. Got=%T",
+			program.Statements[0])
+	}
+
+	callExpr, ok := stmt.Expression.(*ast.CallExpression)
+	if !ok {
+		t.Fatalf("stmt.Expression is not *ast.CallExpression. Got=%T", stmt.Expression)
+	}
+
+	if !testIdentifier(t, callExpr.Function, "add") {
+		return
+	}
+
+	if len(callExpr.Arguments) != 3 {
+		t.Errorf("callExpr.Arguments does not have 3 elements. Got=%d", len(callExpr.Arguments))
+	}
+
+	testLiteralExpression(t, callExpr.Arguments[0], 1)
+	testInfixExpression(t, callExpr.Arguments[1], 2, "*", 3)
+	testInfixExpression(t, callExpr.Arguments[2], 4, "+", 5)
 }
 
 ///////// Helper functions /////////

@@ -112,6 +112,7 @@ func (i *IfExpression) String() string {
 	return b.String()
 }
 
+// func(<params>) { <block> }
 type FuncExpression struct {
 	Token  token.Token // the 'func' token
 	Params []*Identifier
@@ -138,6 +139,36 @@ func (f *FuncExpression) String() string {
 	b.WriteString(") {")
 	b.WriteString(f.Body.String())
 	b.WriteString("}")
+
+	return b.String()
+}
+
+// <expression>(<arguments>)
+type CallExpression struct {
+	Token     token.Token // the '(' token
+	Function  Expression  // Identifier or FuncExpression
+	Arguments []Expression
+}
+
+func (c *CallExpression) expressionNode() {}
+func (c *CallExpression) TokenLiteral() []rune {
+	return c.Token.Literal
+}
+func (c *CallExpression) String() string {
+	var b strings.Builder
+
+	b.WriteString(c.Function.String())
+	b.WriteString("(")
+
+	for i, arg := range c.Arguments {
+		b.WriteString(arg.String())
+
+		if i < len(c.Arguments)-1 {
+			b.WriteString(", ")
+		}
+	}
+
+	b.WriteString(")")
 
 	return b.String()
 }

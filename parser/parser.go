@@ -37,6 +37,8 @@ var precedences = map[token.TokenType]OpPrecedence{
 	token.MULTIPLY: PRODUCT,
 	token.DIVIDE:   PRODUCT,
 	token.MODULUS:  PRODUCT,
+
+	token.LPAREN: FUNCALL,
 }
 
 type (
@@ -89,6 +91,8 @@ func New(lxr *lexer.Lexer) *Parser {
 		token.MULTIPLY: p.parseInfixExpression,
 		token.DIVIDE:   p.parseInfixExpression,
 		token.MODULUS:  p.parseInfixExpression,
+
+		token.LPAREN: p.parseFuncCall,
 	}
 
 	return p
@@ -379,12 +383,19 @@ func (p *Parser) parseFuncParams() []*ast.Identifier {
 	}
 
 	p.nextToken()
-	params = append(params, &ast.Identifier{Token: p.currentToken, Value: p.currentToken.Literal})
+	params = append(params, &ast.Identifier{
+		Token: p.currentToken,
+		Value: p.currentToken.Literal,
+	})
 
 	for p.peekToken.Type == token.COMMA {
-		p.nextToken()
-		p.nextToken()
-		params = append(params, &ast.Identifier{Token: p.currentToken, Value: p.currentToken.Literal})
+		p.nextToken() // skip the comma
+		p.nextToken() // move to the next param
+
+		params = append(params, &ast.Identifier{
+			Token: p.currentToken,
+			Value: p.currentToken.Literal,
+		})
 	}
 
 	if p.peekToken.Type != token.RPAREN {
@@ -395,4 +406,38 @@ func (p *Parser) parseFuncParams() []*ast.Identifier {
 	p.nextToken()
 
 	return params
+}
+
+func (p *Parser) parseFuncCall(left ast.Expression) ast.Expression {
+	expr := &ast.CallExpression{Token: p.currentToken, Function: left}
+	expr.Arguments = p.parseFuncCallArgs()
+
+	return expr
+}
+
+func (p *Parser) parseFuncCallArgs() []ast.Expression {
+	args := []ast.Expression{}
+
+	if p.peekToken.Type == token.RPAREN {
+		p.nextToken()
+		return args
+	}
+
+	p.nextToken()
+	args = append(args, p.parseExpression(LOWEST))
+
+	for p.peekToken.Type == token.COMMA {
+		p.nextToken() // skip the comma
+		p.nextToken() // move to the next arg
+		args = append(args, p.parseExpression(LOWEST))
+	}
+
+	if p.peekToken.Type != token.RPAREN {
+		p.errors = append(p.errors, "Expected ')' after arguments")
+		return nil
+	}
+
+	p.nextToken()
+
+	return args
 }
