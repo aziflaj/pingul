@@ -1,7 +1,10 @@
 package ast
 
+import "strings"
+
 type Node interface {
 	TokenLiteral() []rune
+	String() string
 }
 
 // Something that can be executed
@@ -26,4 +29,14 @@ func (p *Program) TokenLiteral() []rune {
 	}
 
 	return []rune("")
+}
+
+func (p *Program) String() string {
+	var b strings.Builder
+
+	for _, s := range p.Statements {
+		b.WriteString(s.String())
+	}
+
+	return b.String()
 }

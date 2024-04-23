@@ -6,6 +6,7 @@ import (
 	"github.com/aziflaj/pingul/ast"
 	"github.com/aziflaj/pingul/lexer"
 	"github.com/aziflaj/pingul/parser"
+	"github.com/aziflaj/pingul/token"
 )
 
 func TestLetStatements(t *testing.T) {
@@ -122,6 +123,30 @@ return func() {
 			t.Errorf("retStmt.TokenLiteral not 'return'. Got=%q",
 				retStmt.TokenLiteral())
 		}
+	}
+}
+
+func TestStringifiedProgram(t *testing.T) {
+	program := &ast.Program{
+		Statements: []ast.Statement{
+			&ast.VarStatement{
+				Token: token.Token{Type: token.VAR, Literal: []rune("var")},
+				Name: &ast.Identifier{
+					Token: token.Token{Type: token.IDENTIFIER, Literal: []rune("name")},
+					Value: []rune("name"),
+				},
+				Value: &ast.Identifier{
+					Token: token.Token{Type: token.IDENTIFIER, Literal: []rune("userName")},
+					Value: []rune("userName"),
+				},
+			},
+		},
+	}
+
+	expected := "var name = userName;"
+	if program.String() != expected {
+		t.Errorf("program.String() returned %q, expected %q",
+			program.String(), expected)
 	}
 }
 

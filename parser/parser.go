@@ -68,8 +68,8 @@ func (p *Parser) parseStatement() ast.Statement {
 }
 
 func (p *Parser) parseVarStatement() *ast.VarStatement {
-	fmt.Println("Parsing var statement")
-	fmt.Println("Current token:", p.currentToken)
+	// fmt.Println("Parsing var statement")
+	// fmt.Println("Current token:", p.currentToken)
 	stmt := &ast.VarStatement{Token: p.currentToken}
 
 	if p.peekToken.Type != token.IDENTIFIER {
@@ -95,8 +95,8 @@ func (p *Parser) parseVarStatement() *ast.VarStatement {
 }
 
 func (p *Parser) parseReturnStatement() *ast.ReturnStatement {
-	fmt.Println("Parsing return statement")
-	fmt.Println("Current token:", p.currentToken)
+	// fmt.Println("Parsing return statement")
+	// fmt.Println("Current token:", p.currentToken)
 	stmt := &ast.ReturnStatement{Token: p.currentToken}
 
 	// TODO: parse the expression
