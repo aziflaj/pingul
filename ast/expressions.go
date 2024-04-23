@@ -111,3 +111,33 @@ func (i *IfExpression) String() string {
 
 	return b.String()
 }
+
+type FuncExpression struct {
+	Token  token.Token // the 'func' token
+	Params []*Identifier
+	Body   *BlockStatement
+}
+
+func (f *FuncExpression) expressionNode() {}
+func (f *FuncExpression) TokenLiteral() []rune {
+	return f.Token.Literal
+}
+func (f *FuncExpression) String() string {
+	var b strings.Builder
+
+	b.WriteString("func(")
+
+	for i, param := range f.Params {
+		b.WriteString(param.String())
+
+		if i < len(f.Params)-1 {
+			b.WriteString(", ")
+		}
+	}
+
+	b.WriteString(") {")
+	b.WriteString(f.Body.String())
+	b.WriteString("}")
+
+	return b.String()
+}

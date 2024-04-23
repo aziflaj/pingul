@@ -71,6 +71,7 @@ func New(lxr *lexer.Lexer) *Parser {
 		token.FALSE:      p.parseBoolean,
 		token.LPAREN:     p.parseGroupExpressions,
 		token.IF:         p.parseIfExpression,
+		token.FUNC:       p.parseFuncExpression,
 	}
 
 	p.infixParseHandlers = map[token.TokenType]infixParseHandler{
@@ -345,4 +346,53 @@ func (p *Parser) parseBlockStatement() *ast.BlockStatement {
 	}
 
 	return block
+}
+
+func (p *Parser) parseFuncExpression() ast.Expression {
+	expr := &ast.FuncExpression{Token: p.currentToken}
+
+	if p.peekToken.Type != token.LPAREN {
+		p.errors = append(p.errors, "Expected '(' after 'func'")
+		return nil
+	}
+
+	p.nextToken()
+	expr.Params = p.parseFuncParams()
+
+	if p.peekToken.Type != token.LBRACE {
+		p.errors = append(p.errors, "Expected '{' after parameters")
+		return nil
+	}
+
+	p.nextToken()
+	expr.Body = p.parseBlockStatement()
+
+	return expr
+}
+
+func (p *Parser) parseFuncParams() []*ast.Identifier {
+	params := []*ast.Identifier{}
+
+	if p.peekToken.Type == token.RPAREN {
+		p.nextToken()
+		return params
+	}
+
+	p.nextToken()
+	params = append(params, &ast.Identifier{Token: p.currentToken, Value: p.currentToken.Literal})
+
+	for p.peekToken.Type == token.COMMA {
+		p.nextToken()
+		p.nextToken()
+		params = append(params, &ast.Identifier{Token: p.currentToken, Value: p.currentToken.Literal})
+	}
+
+	if p.peekToken.Type != token.RPAREN {
+		p.errors = append(p.errors, "Expected ')' after parameters")
+		return nil
+	}
+
+	p.nextToken()
+
+	return params
 }

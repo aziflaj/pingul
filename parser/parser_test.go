@@ -377,6 +377,102 @@ func TestIfExpressions(t *testing.T) {
 	}
 }
 
+func TestFuncExpressions(t *testing.T) {
+	input := `func(x, y) { x + y; }`
+
+	lxr := lexer.New(input)
+	p := parser.New(lxr)
+	program := p.ParseProgram()
+	assertProgram(t, program)
+	checkParserErrors(t, p)
+	assertProgramLength(t, program, 1)
+
+	stmt, ok := program.Statements[0].(*ast.ExpressionStatement)
+	if !ok {
+		t.Fatalf("program.Statements[0] is not *ast.ExpressionStatement. Got=%T",
+			program.Statements[0])
+	}
+
+	funcExpr, ok := stmt.Expression.(*ast.FuncExpression)
+	if !ok {
+		t.Fatalf("stmt.Expression is not *ast.FuncExpression. Got=%T", stmt.Expression)
+	}
+
+	if len(funcExpr.Params) != 2 {
+		t.Errorf("funcExpr.Params does not have 2 elements. Got=%d", len(funcExpr.Params))
+	}
+
+	testCases := []struct {
+		expectedParam string
+	}{
+		{"x"},
+		{"y"},
+	}
+
+	for i, tc := range testCases {
+		if string(funcExpr.Params[i].Value) != tc.expectedParam {
+			t.Errorf("Expected param %s, got %s",
+				tc.expectedParam, string(funcExpr.Params[i].Value))
+		}
+	}
+
+	if len(funcExpr.Body.Statements) != 1 {
+		t.Errorf("funcExpr.Body does not have 1 statement. Got=%d",
+			len(funcExpr.Body.Statements))
+	}
+
+	bodyStmt, ok := funcExpr.Body.Statements[0].(*ast.ExpressionStatement)
+	if !ok {
+		t.Fatalf("funcExpr.Body.Statements[0] is not *ast.ExpressionStatement. Got=%T",
+			funcExpr.Body.Statements[0])
+	}
+
+	if !testInfixExpression(t, bodyStmt.Expression, "x", "+", "y") {
+		return
+	}
+}
+
+func TestFuncParams(t *testing.T) {
+	testCases := []struct {
+		input    string
+		expected []string
+	}{
+		{"func() {}", []string{}},
+		{"func(x) {}", []string{"x"}},
+		{"func(x, y) {}", []string{"x", "y"}},
+		{"func(x, y, z) {}", []string{"x", "y", "z"}},
+	}
+
+	for _, tc := range testCases {
+		lxr := lexer.New(tc.input)
+		p := parser.New(lxr)
+		program := p.ParseProgram()
+
+		stmt, ok := program.Statements[0].(*ast.ExpressionStatement)
+		if !ok {
+			t.Fatalf("program.Statements[0] is not *ast.ExpressionStatement. Got=%T",
+				program.Statements[0])
+		}
+
+		funcExpr, ok := stmt.Expression.(*ast.FuncExpression)
+		if !ok {
+			t.Fatalf("stmt.Expression is not *ast.FuncExpression. Got=%T", stmt.Expression)
+		}
+
+		if len(funcExpr.Params) != len(tc.expected) {
+			t.Errorf("funcExpr.Params does not have %d elements. Got=%d",
+				len(tc.expected), len(funcExpr.Params))
+		}
+
+		for i, param := range funcExpr.Params {
+			if string(param.Value) != string(tc.expected[i]) {
+				t.Errorf("Expected param %s, got %s",
+					string(tc.expected[i]), string(param.Value))
+			}
+		}
+	}
+}
+
 ///////// Helper functions /////////
 
 func testVarStatement(t *testing.T, s ast.Statement, name string) bool {
