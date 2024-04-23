@@ -85,29 +85,36 @@ func TestParseErrors(t *testing.T) {
 }
 
 func TestReturnStatements(t *testing.T) {
-	input := `return 5;
-return fubar;
-return if (power > 9000) { "strong" } else { "weak" };
-`
+	testCases := []struct {
+		input    string
+		expected interface{}
+	}{
+		{"return 5;", 5},
+		{"return fubar;", "fubar"},
+		{"return false", false},
+	}
 
-	lxr := lexer.New(input)
-	p := parser.New(lxr)
-	program := p.ParseProgram()
+	for _, tc := range testCases {
+		lxr := lexer.New(tc.input)
+		p := parser.New(lxr)
+		program := p.ParseProgram()
 
-	assertProgram(t, program)
-	assertProgramLength(t, program, 3)
+		assertProgram(t, program)
+		assertProgramLength(t, program, 1)
 
-	for _, stmt := range program.Statements {
-		// assert type
-		retStmt, ok := stmt.(*ast.ReturnStatement)
+		retStmt, ok := program.Statements[0].(*ast.ReturnStatement)
 		if !ok {
-			t.Errorf("stmt not *ast.ReturnStatement. Got=%T", stmt)
-			continue
+			t.Fatalf("program.Statements[0] is not *ast.ReturnStatement. Got=%T",
+				program.Statements[0])
 		}
 
 		if string(retStmt.TokenLiteral()) != "return" {
 			t.Errorf("retStmt.TokenLiteral not 'return'. Got=%q",
 				retStmt.TokenLiteral())
+		}
+
+		if !testLiteralExpression(t, retStmt.ReturnValue, tc.expected) {
+			return
 		}
 	}
 }
@@ -668,12 +675,10 @@ func assertProgram(t *testing.T, program *ast.Program) {
 
 func assertProgramLength(t *testing.T, program *ast.Program, expected int) {
 	if len(program.Statements) != expected {
+		for _, stmt := range program.Statements {
+			t.Logf("Statement: %s", stmt.String())
+		}
 		t.Fatalf("program.Statements does not contain %d statements. Got=%d",
 			expected, len(program.Statements))
 	}
-
-	for _, stmt := range program.Statements {
-		t.Logf("Statement: %s", stmt.String())
-	}
-
 }

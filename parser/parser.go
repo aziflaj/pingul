@@ -147,14 +147,12 @@ func (p *Parser) parseVarStatement() *ast.VarStatement {
 		p.peekError(token.Token{Type: token.ASSIGNMENT})
 		return nil
 	}
-
-	p.nextToken()
 	p.nextToken()
 
+	p.nextToken()
 	stmt.Value = p.parseExpression(LOWEST)
 
-	// read until the end of the statement
-	for p.currentToken.Type != token.SEMICOLON {
+	if p.peekToken.Type == token.SEMICOLON {
 		p.nextToken()
 	}
 
@@ -164,10 +162,10 @@ func (p *Parser) parseVarStatement() *ast.VarStatement {
 func (p *Parser) parseReturnStatement() *ast.ReturnStatement {
 	stmt := &ast.ReturnStatement{Token: p.currentToken}
 
-	// TODO: parse the expression
+	p.nextToken()
+	stmt.ReturnValue = p.parseExpression(LOWEST)
 
-	// read until the end of the statement
-	for p.currentToken.Type != token.SEMICOLON {
+	if p.peekToken.Type == token.SEMICOLON {
 		p.nextToken()
 	}
 
