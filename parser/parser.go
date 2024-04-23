@@ -148,7 +148,10 @@ func (p *Parser) parseVarStatement() *ast.VarStatement {
 		return nil
 	}
 
-	// TODO: parse the expression
+	p.nextToken()
+	p.nextToken()
+
+	stmt.Value = p.parseExpression(LOWEST)
 
 	// read until the end of the statement
 	for p.currentToken.Type != token.SEMICOLON {

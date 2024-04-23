@@ -10,30 +10,36 @@ import (
 	"github.com/aziflaj/pingul/token"
 )
 
-func TestLetStatements(t *testing.T) {
-	input := `var age = 28;
-var name = "SpongeBob";
-var result = 10 * (20 / 2);
-`
-
-	lxr := lexer.New(input)
-	p := parser.New(lxr)
-	program := p.ParseProgram()
-
-	assertProgram(t, program)
-	assertProgramLength(t, program, 3)
-
+func TestVarStatements(t *testing.T) {
 	testCases := []struct {
-		expectedIdentifier string
+		input      string
+		identifier string
+		value      interface{}
 	}{
-		{"age"},
-		{"name"},
-		{"result"},
+		{"var age = 28;", "age", 28},
+		{"var foo = bar;", "foo", "bar"},
+		{"var CoolLang = true;", "CoolLang", true},
 	}
 
-	for i, tc := range testCases {
-		stmt := program.Statements[i]
-		if !testVarStatement(t, stmt, tc.expectedIdentifier) {
+	for _, tc := range testCases {
+		lxr := lexer.New(tc.input)
+		p := parser.New(lxr)
+		program := p.ParseProgram()
+
+		assertProgram(t, program)
+		assertProgramLength(t, program, 1)
+		stmt := program.Statements[0]
+
+		if !testVarStatement(t, stmt, tc.identifier) {
+			return
+		}
+
+		varStmt, ok := stmt.(*ast.VarStatement)
+		if !ok {
+			t.Fatalf("stmt not *ast.VarStatement. Got=%T", stmt)
+		}
+
+		if !testLiteralExpression(t, varStmt.Value, tc.value) {
 			return
 		}
 	}

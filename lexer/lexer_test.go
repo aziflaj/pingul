@@ -180,7 +180,3 @@ var z = x + y;`
 		}
 	}
 }
-
-func TestOperatorToken(t *testing.T) {
-
-}
