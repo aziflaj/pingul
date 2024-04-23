@@ -6,7 +6,7 @@ import (
 	"io"
 
 	"github.com/aziflaj/pingul/lexer"
-	"github.com/aziflaj/pingul/token"
+	"github.com/aziflaj/pingul/parser"
 )
 
 const PROMPT = "(pingul)>> "
@@ -28,8 +28,22 @@ func Start(in io.Reader, out io.Writer) {
 		}
 
 		lxr := lexer.New(input)
-		for tkn := lxr.NextToken(); tkn.Type != token.EOF; tkn = lxr.NextToken() {
-			fmt.Fprintf(out, "%+v\n", tkn)
+		p := parser.New(lxr)
+
+		program := p.ParseProgram()
+
+		if len(p.Errors()) != 0 {
+			printParserErrors(out, p.Errors())
+			continue
 		}
+
+		fmt.Fprintf(out, program.String())
+		fmt.Fprintf(out, "\n\n")
+	}
+}
+
+func printParserErrors(out io.Writer, errors []string) {
+	for _, msg := range errors {
+		fmt.Fprintf(out, "\t%s\n", msg)
 	}
 }
