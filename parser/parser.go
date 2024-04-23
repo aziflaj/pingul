@@ -13,6 +13,8 @@ type Parser struct {
 
 	currentToken token.Token
 	peekToken    token.Token
+
+	errors []string
 }
 
 func New(lxr *lexer.Lexer) *Parser {
@@ -23,6 +25,10 @@ func New(lxr *lexer.Lexer) *Parser {
 	p.nextToken()
 
 	return p
+}
+
+func (p *Parser) Errors() []string {
+	return p.errors
 }
 
 func (p *Parser) ParseProgram() *ast.Program {
@@ -70,6 +76,7 @@ func (p *Parser) parseVarStatement() *ast.VarStatement {
 	stmt.Name = &ast.Identifier{Token: p.currentToken, Value: p.currentToken.Literal}
 
 	if p.peekToken.Type != token.ASSIGNMENT {
+		p.peekError(token.Token{Type: token.ASSIGNMENT})
 		return nil
 	}
 
@@ -81,4 +88,10 @@ func (p *Parser) parseVarStatement() *ast.VarStatement {
 	}
 
 	return stmt
+}
+
+func (p *Parser) peekError(expected token.Token) {
+	msg := fmt.Sprintf("Expected next token to be %s, got %s instead",
+		expected, p.peekToken)
+	p.errors = append(p.errors, msg)
 }
