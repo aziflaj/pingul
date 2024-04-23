@@ -80,6 +80,10 @@ var Delimiters = map[rune]TokenType{
 	';': SEMICOLON,
 }
 
+var UnaryOperators = map[rune]TokenType{
+	'-': MINUS,
+}
+
 var Operators = map[rune]TokenType{
 	'=': ASSIGNMENT,
 	'+': PLUS,

@@ -23,7 +23,11 @@ if (age < newAge) {
 var truthness = (age <= newAge) and (2 >= 1);
 var falseness = (age > newAge) or (2 < 1);
 
-var amIAlive = true and not false;`
+var amIAlive = true and not false;
+
+var x = 1;
+var y = -x;
+var z = x + y;`
 
 	tests := []struct {
 		expectedType    token.TokenType
@@ -131,20 +135,52 @@ var amIAlive = true and not false;`
 		{token.FALSE, []rune("false")},
 		{token.SEMICOLON, []rune(";")},
 
+		{token.VAR, []rune("var")},
+		{token.IDENTIFIER, []rune("x")},
+		{token.ASSIGNMENT, []rune("=")},
+		{token.INT, []rune("1")},
+		{token.SEMICOLON, []rune(";")},
+
+		{token.VAR, []rune("var")},
+		{token.IDENTIFIER, []rune("y")},
+		{token.ASSIGNMENT, []rune("=")},
+		{token.MINUS, []rune("-")},
+		{token.IDENTIFIER, []rune("x")},
+		{token.SEMICOLON, []rune(";")},
+
+		{token.VAR, []rune("var")},
+		{token.IDENTIFIER, []rune("z")},
+		{token.ASSIGNMENT, []rune("=")},
+		{token.IDENTIFIER, []rune("x")},
+		{token.PLUS, []rune("+")},
+		{token.IDENTIFIER, []rune("y")},
+		{token.SEMICOLON, []rune(";")},
+
 		{token.EOF, []rune("")},
 	}
 
 	lxr := lexer.New(input)
 
-	for i, testToken := range tests {
-		token := lxr.NextToken()
+	for i, tt := range tests {
+		tkn := lxr.NextToken()
 
-		if token.Type != testToken.expectedType {
-			t.Fatalf("tests[%d] - wrong token type. Expected=%v, got=%v", i, testToken.expectedType, token.Type)
+		testToken := token.Token{
+			Type:    tt.expectedType,
+			Literal: tt.expectedLiteral,
 		}
 
-		if string(token.Literal) != string(testToken.expectedLiteral) {
-			t.Fatalf("tests[%d] - wrong token literal. Expected=%v, got=%v", i, testToken.expectedLiteral, token.Literal)
+		if tkn.Type != testToken.Type {
+			t.Fatalf("tests[%d] - wrong Token Type. Expected=%v, got=%v",
+				i, testToken, tkn)
+		}
+
+		if string(tkn.Literal) != string(testToken.Literal) {
+			t.Fatalf("tests[%d] - wrong Token Literal. Expected=%v, got=%v",
+				i, testToken, tkn)
 		}
 	}
+}
+
+func TestOperatorToken(t *testing.T) {
+
 }
