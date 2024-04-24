@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 
+	"github.com/aziflaj/pingul/eval"
 	"github.com/aziflaj/pingul/lexer"
 	"github.com/aziflaj/pingul/parser"
 )
@@ -37,7 +38,9 @@ func Start(in io.Reader, out io.Writer) {
 			continue
 		}
 
-		fmt.Fprintf(out, program.String())
+		result := eval.Eval(program)
+
+		fmt.Fprintf(out, result.Inspect())
 		fmt.Fprintf(out, "\n\n")
 	}
 }
