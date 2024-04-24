@@ -20,7 +20,15 @@ func Start(in io.Reader, out io.Writer) {
 		fmt.Fprintf(out, PROMPT)
 
 		scanner := bufio.NewScanner(in)
-		scanner.Scan()
+		if !scanner.Scan() {
+			if err := scanner.Err(); err != nil {
+				fmt.Fprintf(out, "Error reading input: %s\n", err)
+			} else {
+				fmt.Fprintf(out, "\nAdios!\n")
+			}
+			break
+		}
+
 		input := scanner.Text()
 
 		if input == "exit" {
