@@ -178,6 +178,42 @@ func TestInfixIntOperations(t *testing.T) {
 	}
 }
 
+func TestIfElse(t *testing.T) {
+	testCases := []struct {
+		input    string
+		expected interface{}
+	}{
+		{"if (true) { 10 }", 10},
+		{"if (false) { 10 }", nil},
+		{"if (1) { 10 }", 10},
+		{"if (0) { 10 }", nil},
+		{"if (5) { 10 }", 10},
+		{"if (5 < 10) { 10 }", 10},
+		{"if (5 > 10) { 10 }", nil},
+		{"if (5 > 10) { 10 } else { 20 }", 20},
+		{"if (5 < 10) { 10 } else { 20 }", 10},
+		{"if (nil) { 10 } else {20 }", 20},
+	}
+
+	for _, tc := range testCases {
+		lxr := lexer.New(tc.input)
+		psr := parser.New(lxr)
+		program := psr.ParseProgram()
+
+		evaluated := eval.Eval(program)
+
+		integer, ok := tc.expected.(int)
+		if ok {
+			assertIntegerObject(t, evaluated, int64(integer))
+		} else {
+			_, ok := evaluated.(*object.Nil)
+			if !ok {
+				t.Fatalf("Expected nil object. Got=%v", evaluated)
+			}
+		}
+	}
+}
+
 ///////// HELPER FUNCTIONS //////////
 
 func assertIntegerObject(t *testing.T, obj object.Object, expected int64) {

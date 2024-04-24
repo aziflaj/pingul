@@ -9,6 +9,8 @@ func Eval(node ast.Node) object.Object {
 	switch node := node.(type) {
 	case *ast.Program:
 		return evalStatements(node.Statements)
+	case *ast.BlockStatement:
+		return evalStatements(node.Statements)
 
 	case *ast.ExpressionStatement:
 		return Eval(node.Expression)
@@ -28,6 +30,10 @@ func Eval(node ast.Node) object.Object {
 		right := Eval(node.Right)
 		return evalInfixExpression(node.Operator, left, right)
 
+	case *ast.IfExpression:
+		cond := Eval(node.Condition)
+		return evalIfExpression(cond.IsTruthy(), node.Consequence, node.Alternative)
+
 	default:
 		return &object.Nil{}
 	}
@@ -45,11 +51,7 @@ func evalStatements(stmts []ast.Statement) object.Object {
 
 func evalPrefixExpression(operator string, right object.Object) object.Object {
 	if operator == "not" {
-		if right.Type() == object.BOOL {
-			return &object.Boolean{Value: !right.(*object.Boolean).Value}
-		} else if right.Type() == object.INT {
-			return &object.Boolean{Value: right.(*object.Integer).Value == 0}
-		}
+		return &object.Boolean{Value: !right.IsTruthy()}
 	}
 
 	if operator == "-" && right.Type() == object.INT {
@@ -65,7 +67,7 @@ func evalInfixExpression(operator string, left object.Object, right object.Objec
 	if left.Type() == object.BOOL {
 		// transform right value to boolean
 		if right.Type() == object.INT {
-			right = &object.Boolean{Value: right.(*object.Integer).Value != 0}
+			right = &object.Boolean{Value: right.IsTruthy()}
 		}
 
 		return evalBooleanInfixExpression(operator, left, right)
@@ -138,6 +140,18 @@ func evalIntegerInfixExpression(
 		return &object.Boolean{Value: leftInt >= rightInt}
 	case "<=":
 		return &object.Boolean{Value: leftInt <= rightInt}
+	}
+
+	return &object.Nil{}
+}
+
+func evalIfExpression(cond bool, consequence *ast.BlockStatement, alternative *ast.BlockStatement) object.Object {
+	if cond {
+		return Eval(consequence)
+	}
+
+	if alternative != nil {
+		return Eval(alternative)
 	}
 
 	return &object.Nil{}
