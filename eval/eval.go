@@ -88,7 +88,10 @@ func evalInfixExpression(operator string, left object.Object, right object.Objec
 	return &object.Nil{}
 }
 
-func evalBooleanInfixExpression(operator string, left object.Object, right object.Object) object.Object {
+func evalBooleanInfixExpression(
+	operator string,
+	left object.Object, right object.Object,
+) object.Object {
 	leftBool := left.(*object.Boolean).Value
 	rightBool := right.(*object.Boolean).Value
 
@@ -103,7 +106,10 @@ func evalBooleanInfixExpression(operator string, left object.Object, right objec
 	return &object.Nil{}
 }
 
-func evalIntegerInfixExpression(operator string, left object.Object, right object.Object) object.Object {
+func evalIntegerInfixExpression(
+	operator string,
+	left object.Object, right object.Object,
+) object.Object {
 	leftInt := left.(*object.Integer).Value
 	rightInt := right.(*object.Integer).Value
 

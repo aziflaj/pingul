@@ -101,6 +101,14 @@ func TestInfixBool(t *testing.T) {
 
 		{"not 0 == true", true},
 		{"not 0 == false", false},
+
+		{"1 == 2 == false", true},
+		{"1 == 1 == true", true},
+		{"1 < 2 == true", true},
+		{"1 > 2 == false", true},
+		{"1 <= 2 == true", true},
+		{"1 >= 2 == true", false},
+		{"not (1 >= 2) == false", false},
 	}
 
 	for _, tc := range testCases {
