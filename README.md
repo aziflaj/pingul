@@ -1,6 +1,6 @@
 # PinguL
 
-PinguL (short for PinguLang) is a programming language that I'm creating for fun.
+PinguL (short for Pingu-Lang) is a programming language that I'm creating for fun.
 
 ![pingu](https://github.com/aziflaj/pingul/assets/5219775/6de2c555-1237-41ca-95fd-18349d2d247f)
 
@@ -26,3 +26,26 @@ var falseness = (age > newAge) or (2 < 1);
 
 var amIAlive = true and not false;
 ```
+
+Here's how Fibonacci looks like in PinguL (also in `fib.pl`):
+
+```js
+var fib = func(n) {
+	if (n <= 1) {
+		return n;
+	}
+
+	return fib(n - 1) + fib(n - 2);
+};
+
+var result = fib(10);
+```
+
+And if you run it you'll see something like this:
+
+```bash
+➜ go run cmd/pingulcc/main.go fib.pl
+INT(55)
+Done!
+```
+
