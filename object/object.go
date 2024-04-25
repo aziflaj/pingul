@@ -1,6 +1,11 @@
 package object
 
-import "fmt"
+import (
+	"fmt"
+	"strings"
+
+	"github.com/aziflaj/pingul/ast"
+)
 
 type ObjectType string
 
@@ -9,6 +14,7 @@ const (
 	BOOL   = ObjectType("BOOL")
 	NIL    = ObjectType("NIL")
 	RETURN = ObjectType("RETURN")
+	FUNC   = ObjectType("FUNC")
 )
 
 type Object interface {
@@ -47,3 +53,27 @@ type Return struct {
 func (r *Return) Type() ObjectType { return RETURN }
 func (r *Return) Inspect() string  { return r.Value.Inspect() }
 func (r *Return) IsTruthy() bool   { return r.Value.IsTruthy() }
+
+type Func struct {
+	Params []*ast.Identifier
+	Body   *ast.BlockStatement
+}
+
+func (f *Func) Type() ObjectType { return FUNC }
+func (f *Func) IsTruthy() bool   { return true }
+func (f *Func) Inspect() string {
+	var b strings.Builder
+
+	b.WriteString("func(")
+	for i, p := range f.Params {
+		b.WriteString(p.String())
+		if i < len(f.Params)-1 {
+			b.WriteString(", ")
+		}
+	}
+	b.WriteString(") {\n")
+	b.WriteString(f.Body.String())
+	b.WriteString("\n}")
+
+	return b.String()
+}

@@ -5,21 +5,21 @@ import (
 	"github.com/aziflaj/pingul/object"
 )
 
-var vt = object.NewVarTable()
+var scope = object.NewScope()
 
-func Eval(node ast.Node) object.Object {
+func Eval(scope *object.Scope, node ast.Node) object.Object {
 	switch node := node.(type) {
 	case *ast.Program:
-		return evalProgram(node)
+		return evalProgram(scope, node)
 
 	case *ast.BlockStatement:
-		return evalBlock(node)
+		return evalBlock(scope, node)
 
 	case *ast.ReturnStatement:
-		return &object.Return{Value: Eval(node.ReturnValue)}
+		return &object.Return{Value: Eval(scope, node.ReturnValue)}
 
 	case *ast.ExpressionStatement:
-		return Eval(node.Expression)
+		return Eval(scope, node.Expression)
 
 	case *ast.IntegerLiteral:
 		return &object.Integer{Value: node.Value}
@@ -30,25 +30,42 @@ func Eval(node ast.Node) object.Object {
 	case *ast.Nil:
 		return &object.Nil{}
 
+	case *ast.FuncExpression:
+		fun := &object.Func{Params: node.Params, Body: node.Body}
+		funName := node.Token.String()
+		scope.Set(funName, fun)
+		return fun
+
+	case *ast.CallExpression:
+		// eval args, left to right
+		args := make([]object.Object, len(node.Arguments))
+		for i, arg := range node.Arguments {
+			args[i] = Eval(scope, arg)
+		}
+
+		fun := Eval(scope, node.Function)
+
+		return applyFunction(scope, fun, args)
+
 	case *ast.VarStatement:
-		val := Eval(node.Value)
-		vt.Set(node.Name.String(), val)
+		val := Eval(scope, node.Value)
+		scope.Set(node.Name.String(), val)
 		return val
 
 	case *ast.Identifier:
-		return vt.Get(node.String())
+		return scope.Get(node.String())
 
 	case *ast.PrefixExpression:
-		right := Eval(node.Right)
+		right := Eval(scope, node.Right)
 		return evalPrefixExpression(node.Operator, right)
 
 	case *ast.InfixExpression:
-		left := Eval(node.Left)
-		right := Eval(node.Right)
+		left := Eval(scope, node.Left)
+		right := Eval(scope, node.Right)
 		return evalInfixExpression(node.Operator, left, right)
 
 	case *ast.IfExpression:
-		cond := Eval(node.Condition)
+		cond := Eval(scope, node.Condition)
 		return evalIfExpression(cond.IsTruthy(), node.Consequence, node.Alternative)
 
 	default:
@@ -56,11 +73,11 @@ func Eval(node ast.Node) object.Object {
 	}
 }
 
-func evalProgram(program *ast.Program) object.Object {
+func evalProgram(scope *object.Scope, program *ast.Program) object.Object {
 	var result object.Object
 
 	for _, stmt := range program.Statements {
-		result = Eval(stmt)
+		result = Eval(scope, stmt)
 
 		if val, ok := result.(*object.Return); ok {
 			return val.Value
@@ -70,11 +87,11 @@ func evalProgram(program *ast.Program) object.Object {
 	return result
 }
 
-func evalBlock(block *ast.BlockStatement) object.Object {
+func evalBlock(scope *object.Scope, block *ast.BlockStatement) object.Object {
 	var result object.Object
 
 	for _, stmt := range block.Statements {
-		result = Eval(stmt)
+		result = Eval(scope, stmt)
 
 		if result.Type() == object.RETURN {
 			return result
@@ -179,12 +196,33 @@ func evalIntegerInfixExpression(
 
 func evalIfExpression(cond bool, consequence *ast.BlockStatement, alternative *ast.BlockStatement) object.Object {
 	if cond {
-		return Eval(consequence)
+		return Eval(scope, consequence)
 	}
 
 	if alternative != nil {
-		return Eval(alternative)
+		return Eval(scope, alternative)
 	}
 
 	return &object.Nil{}
+}
+
+func applyFunction(scope *object.Scope, fun object.Object, args []object.Object) object.Object {
+	if fun.Type() != object.FUNC {
+		return &object.Nil{}
+	}
+
+	function := fun.(*object.Func)
+	localScope := object.NewLocalScope(scope)
+
+	for i, param := range function.Params {
+		localScope.Set(param.String(), args[i])
+	}
+
+	result := Eval(localScope, function.Body)
+
+	if result.Type() == object.RETURN {
+		return result.(*object.Return).Value
+	}
+
+	return result
 }

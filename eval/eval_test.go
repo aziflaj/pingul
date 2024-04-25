@@ -20,11 +20,7 @@ func TestEvalInt(t *testing.T) {
 	}
 
 	for _, tc := range testCases {
-		lxr := lexer.New(tc.input)
-		psr := parser.New(lxr)
-		program := psr.ParseProgram()
-
-		evaluated := eval.Eval(program)
+		evaluated := evalProgram(tc.input)
 		assertIntegerObject(t, evaluated, tc.expected)
 	}
 }
@@ -39,11 +35,7 @@ func TestEvalBool(t *testing.T) {
 	}
 
 	for _, tc := range testCases {
-		lxr := lexer.New(tc.input)
-		psr := parser.New(lxr)
-		program := psr.ParseProgram()
-
-		evaluated := eval.Eval(program)
+		evaluated := evalProgram(tc.input)
 		assertBooleanObject(t, evaluated, tc.expected)
 	}
 }
@@ -70,11 +62,7 @@ func TestPrefixBoolNegation(t *testing.T) {
 	}
 
 	for _, tc := range testCases {
-		lxr := lexer.New(tc.input)
-		psr := parser.New(lxr)
-		program := psr.ParseProgram()
-
-		evaluated := eval.Eval(program)
+		evaluated := evalProgram(tc.input)
 		assertBooleanObject(t, evaluated, tc.expected)
 	}
 }
@@ -112,42 +100,34 @@ func TestInfixBool(t *testing.T) {
 	}
 
 	for _, tc := range testCases {
-		lxr := lexer.New(tc.input)
-		psr := parser.New(lxr)
-		program := psr.ParseProgram()
-
-		evaluated := eval.Eval(program)
+		evaluated := evalProgram(tc.input)
 		assertBooleanObject(t, evaluated, tc.expected)
 	}
 }
 
 func TestInfixIntOperations(t *testing.T) {
-	// intEvaledTestCases := []struct {
-	// 	input    string
-	// 	expected int64
-	// }{
-	// 	{"5 + 5", 10},
-	// 	{"5 - 5", 0},
-	// 	{"5 * 5", 25},
-	// 	{"5 / 5", 1},
-	// 	{"5 % 5", 0},
-	// 	{"5 % 3", 2},
+	intEvaledTestCases := []struct {
+		input    string
+		expected int64
+	}{
+		{"5 + 5", 10},
+		{"5 - 5", 0},
+		{"5 * 5", 25},
+		{"5 / 5", 1},
+		{"5 % 5", 0},
+		{"5 % 3", 2},
 
-	// 	{"5 + 5 * 5", 30},
-	// 	{"5 * 5 + 5", 30},
-	// 	{"5 * 5 / 5", 5},
+		{"5 + 5 * 5", 30},
+		{"5 * 5 + 5", 30},
+		{"5 * 5 / 5", 5},
 
-	// 	{"5 + 5 * 5 - 5", 25},
-	// }
+		{"5 + 5 * 5 - 5", 25},
+	}
 
-	// for _, tc := range intEvaledTestCases {
-	// 	lxr := lexer.New(tc.input)
-	// 	psr := parser.New(lxr)
-	// 	program := psr.ParseProgram()
-
-	// 	evaluated := eval.Eval(program)
-	// 	assertIntegerObject(t, evaluated, tc.expected)
-	// }
+	for _, tc := range intEvaledTestCases {
+		evaluated := evalProgram(tc.input)
+		assertIntegerObject(t, evaluated, tc.expected)
+	}
 
 	boolEvaledTestCases := []struct {
 		input    string
@@ -172,11 +152,7 @@ func TestInfixIntOperations(t *testing.T) {
 	}
 
 	for _, tc := range boolEvaledTestCases {
-		lxr := lexer.New(tc.input)
-		psr := parser.New(lxr)
-		program := psr.ParseProgram()
-
-		evaluated := eval.Eval(program)
+		evaluated := evalProgram(tc.input)
 		assertBooleanObject(t, evaluated, tc.expected)
 	}
 }
@@ -199,11 +175,7 @@ func TestIfElse(t *testing.T) {
 	}
 
 	for _, tc := range testCases {
-		lxr := lexer.New(tc.input)
-		psr := parser.New(lxr)
-		program := psr.ParseProgram()
-
-		evaluated := eval.Eval(program)
+		evaluated := evalProgram(tc.input)
 
 		integer, ok := tc.expected.(int)
 		if ok {
@@ -229,11 +201,7 @@ func TestReturnStatements(t *testing.T) {
 	}
 
 	for _, tc := range testCases {
-		lxr := lexer.New(tc.input)
-		psr := parser.New(lxr)
-		program := psr.ParseProgram()
-
-		evaluated := eval.Eval(program)
+		evaluated := evalProgram(tc.input)
 		assertIntegerObject(t, evaluated, tc.expected)
 	}
 
@@ -245,11 +213,7 @@ if (10 > 1) {
 	return false;
 }`
 
-	lxr := lexer.New(input)
-	psr := parser.New(lxr)
-	program := psr.ParseProgram()
-
-	evaluated := eval.Eval(program)
+	evaluated := evalProgram(input)
 	assertBooleanObject(t, evaluated, true)
 }
 
@@ -266,24 +230,58 @@ func TestVarStatements(t *testing.T) {
 	}
 
 	for _, tc := range testCases {
-		lxr := lexer.New(tc.input)
-		psr := parser.New(lxr)
-		program := psr.ParseProgram()
-
-		evaluated := eval.Eval(program)
+		evaluated := evalProgram(tc.input)
 		assertIntegerObject(t, evaluated, tc.expected)
 	}
 
 	// test unasigned variable
 	input := `a;`
-	lxr := lexer.New(input)
-	psr := parser.New(lxr)
-	program := psr.ParseProgram()
-
-	evaluated := eval.Eval(program)
+	evaluated := evalProgram(input)
 	_, ok := evaluated.(*object.Nil)
 	if !ok {
 		t.Fatalf("Expected nil object. Got=%v", evaluated)
+	}
+}
+
+func TestFuncs(t *testing.T) {
+	input := `func(x) { x + 1; }`
+	evaluated := evalProgram(input)
+
+	fun, ok := evaluated.(*object.Func)
+	if !ok {
+		t.Fatalf("Expected Func object. Got=%v", evaluated)
+	}
+
+	if len(fun.Params) != 1 {
+		t.Fatalf("Wrong params: %v", fun.Params)
+	}
+
+	if fun.Params[0].String() != "x" {
+		t.Fatalf("Expected 'x'. Got=%s", fun.Params[0].String())
+	}
+
+	expectedBody := `{(x + 1)}`
+	if fun.Body.String() != expectedBody {
+		t.Fatalf("Expected %s. Got=%s", expectedBody, fun.Body.String())
+	}
+}
+
+func TestFuncCalls(t *testing.T) {
+	testCases := []struct {
+		input    string
+		expected int64
+	}{
+		{"var self = func(x) { x; }; self(5);", 5},
+		{"var add = func(x, y) { x + y; }; add(5, 5);", 10},
+		{"var twice = func(x) { x * 2; }; twice(5);", 10},
+		{"var add = func(x, y) { x + y; }; add(5 + 5, add(5, 5));", 20},
+		{"func (x) { x % 2; }(5);", 1}, // IIFE go brr
+	}
+
+	for _, tc := range testCases {
+		t.Logf("Running test case: %s", tc.input)
+		evaluated := evalProgram(tc.input)
+		assertIntegerObject(t, evaluated, tc.expected)
 	}
 }
 
@@ -309,4 +307,13 @@ func assertBooleanObject(t *testing.T, obj object.Object, expected bool) {
 	if boolean.Value != expected {
 		t.Fatalf("Object has wrong value. Got=%t, Expected=%t", boolean.Value, expected)
 	}
+}
+
+func evalProgram(input string) object.Object {
+	lxr := lexer.New(input)
+	psr := parser.New(lxr)
+	program := psr.ParseProgram()
+	scope := object.NewScope()
+
+	return eval.Eval(scope, program)
 }

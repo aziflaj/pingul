@@ -7,6 +7,7 @@ import (
 
 	"github.com/aziflaj/pingul/eval"
 	"github.com/aziflaj/pingul/lexer"
+	"github.com/aziflaj/pingul/object"
 	"github.com/aziflaj/pingul/parser"
 )
 
@@ -46,7 +47,8 @@ func Start(in io.Reader, out io.Writer) {
 			continue
 		}
 
-		result := eval.Eval(program)
+		globalScope := object.NewScope()
+		result := eval.Eval(globalScope, program)
 
 		fmt.Fprintf(out, result.Inspect())
 		fmt.Fprintf(out, "\n\n")
