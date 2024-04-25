@@ -33,6 +33,18 @@ func (b *Boolean) String() string {
 	return string(b.Token.Literal)
 }
 
+type Nil struct {
+	Token token.Token
+}
+
+func (n *Nil) expressionNode() {}
+func (n *Nil) TokenLiteral() []rune {
+	return n.Token.Literal
+}
+func (n *Nil) String() string {
+	return string(n.Token.Literal)
+}
+
 // - <expression>
 // not <expression>
 type PrefixExpression struct {

@@ -21,6 +21,9 @@ func Eval(node ast.Node) object.Object {
 	case *ast.Boolean:
 		return &object.Boolean{Value: node.Value}
 
+	case *ast.Nil:
+		return &object.Nil{}
+
 	case *ast.PrefixExpression:
 		right := Eval(node.Right)
 		return evalPrefixExpression(node.Operator, right)
@@ -64,15 +67,6 @@ func evalPrefixExpression(operator string, right object.Object) object.Object {
 // if left value is bool, all is bool
 // if left value is int, all is int
 func evalInfixExpression(operator string, left object.Object, right object.Object) object.Object {
-	if left.Type() == object.BOOL {
-		// transform right value to boolean
-		if right.Type() == object.INT {
-			right = &object.Boolean{Value: right.IsTruthy()}
-		}
-
-		return evalBooleanInfixExpression(operator, left, right)
-	}
-
 	if left.Type() == object.INT {
 		// transform right value to integer
 		if right.Type() == object.BOOL {
@@ -87,7 +81,13 @@ func evalInfixExpression(operator string, left object.Object, right object.Objec
 		return evalIntegerInfixExpression(operator, left, right)
 	}
 
-	return &object.Nil{}
+	// left value is bool or nil
+	leftBool := &object.Boolean{Value: left.IsTruthy()}
+	rightBool := &object.Boolean{Value: right.IsTruthy()}
+
+	return evalBooleanInfixExpression(operator, leftBool, rightBool)
+
+	// return &object.Nil{}
 }
 
 func evalBooleanInfixExpression(
