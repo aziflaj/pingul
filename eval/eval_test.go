@@ -217,6 +217,42 @@ func TestIfElse(t *testing.T) {
 	}
 }
 
+func TestReturnStatements(t *testing.T) {
+	testCases := []struct {
+		input    string
+		expected int64
+	}{
+		{"return 10;", 10},
+		{"return 10; 9;", 10},
+		{"return 1 + 2; 9;", 3},
+		{"true; return 1; false;", 1},
+	}
+
+	for _, tc := range testCases {
+		lxr := lexer.New(tc.input)
+		psr := parser.New(lxr)
+		program := psr.ParseProgram()
+
+		evaluated := eval.Eval(program)
+		assertIntegerObject(t, evaluated, tc.expected)
+	}
+
+	input := `
+if (10 > 1) {
+	if (true != false) {
+		return true;
+	}
+	return false;
+}`
+
+	lxr := lexer.New(input)
+	psr := parser.New(lxr)
+	program := psr.ParseProgram()
+
+	evaluated := eval.Eval(program)
+	assertBooleanObject(t, evaluated, true)
+}
+
 ///////// HELPER FUNCTIONS //////////
 
 func assertIntegerObject(t *testing.T, obj object.Object, expected int64) {

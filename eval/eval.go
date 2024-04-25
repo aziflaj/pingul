@@ -8,9 +8,12 @@ import (
 func Eval(node ast.Node) object.Object {
 	switch node := node.(type) {
 	case *ast.Program:
-		return evalStatements(node.Statements)
+		return evalProgram(node)
 	case *ast.BlockStatement:
-		return evalStatements(node.Statements)
+		return evalBlock(node)
+
+	case *ast.ReturnStatement:
+		return &object.Return{Value: Eval(node.ReturnValue)}
 
 	case *ast.ExpressionStatement:
 		return Eval(node.Expression)
@@ -42,11 +45,29 @@ func Eval(node ast.Node) object.Object {
 	}
 }
 
-func evalStatements(stmts []ast.Statement) object.Object {
+func evalProgram(program *ast.Program) object.Object {
 	var result object.Object
 
-	for _, stmt := range stmts {
+	for _, stmt := range program.Statements {
 		result = Eval(stmt)
+
+		if val, ok := result.(*object.Return); ok {
+			return val.Value
+		}
+	}
+
+	return result
+}
+
+func evalBlock(block *ast.BlockStatement) object.Object {
+	var result object.Object
+
+	for _, stmt := range block.Statements {
+		result = Eval(stmt)
+
+		if result.Type() == object.RETURN {
+			return result
+		}
 	}
 
 	return result

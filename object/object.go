@@ -5,9 +5,10 @@ import "fmt"
 type ObjectType string
 
 const (
-	INT  = ObjectType("INT")
-	BOOL = ObjectType("BOOL")
-	NIL  = ObjectType("NIL")
+	INT    = ObjectType("INT")
+	BOOL   = ObjectType("BOOL")
+	NIL    = ObjectType("NIL")
+	RETURN = ObjectType("RETURN")
 )
 
 type Object interface {
@@ -38,3 +39,11 @@ type Nil struct{}
 func (n *Nil) Type() ObjectType { return NIL }
 func (n *Nil) Inspect() string  { return string(n.Type()) }
 func (n *Nil) IsTruthy() bool   { return false }
+
+type Return struct {
+	Value Object
+}
+
+func (r *Return) Type() ObjectType { return RETURN }
+func (r *Return) Inspect() string  { return r.Value.Inspect() }
+func (r *Return) IsTruthy() bool   { return r.Value.IsTruthy() }
