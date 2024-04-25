@@ -253,6 +253,67 @@ if (10 > 1) {
 	assertBooleanObject(t, evaluated, true)
 }
 
+func TestVarStatements(t *testing.T) {
+	testCases := []struct {
+		input    string
+		expected int64
+	}{
+		{"var x = 5; x;", 5},
+		{"var x = 5; var y = 10; x + y;", 15},
+		{"var x = 5; var y = 10; var z = 15; x + y + z;", 30},
+	}
+
+	for _, tc := range testCases {
+		lxr := lexer.New(tc.input)
+		psr := parser.New(lxr)
+		program := psr.ParseProgram()
+
+		evaluated := eval.Eval(program)
+		assertIntegerObject(t, evaluated, tc.expected)
+	}
+
+	// Test variable shadowing
+	input := `
+var x = 5;
+if (true) {
+	var x = 10;
+	return x;
+}`
+	lxr := lexer.New(input)
+	psr := parser.New(lxr)
+	program := psr.ParseProgram()
+
+	evaluated := eval.Eval(program)
+	assertIntegerObject(t, evaluated, 10)
+
+	input = `
+var x = 5;
+if (false) {
+	var x = 10;
+	return x;
+}
+return x;`
+	lxr = lexer.New(input)
+	psr = parser.New(lxr)
+	program = psr.ParseProgram()
+
+	evaluated = eval.Eval(program)
+	assertIntegerObject(t, evaluated, 5)
+
+	// test unasigned variable
+	input = `a;`
+
+	lxr = lexer.New(input)
+	psr = parser.New(lxr)
+	program = psr.ParseProgram()
+
+	evaluated = eval.Eval(program)
+	_, ok := evaluated.(*object.Nil)
+	if !ok {
+		t.Fatalf("Expected nil object. Got=%v", evaluated)
+	}
+}
+
 ///////// HELPER FUNCTIONS //////////
 
 func assertIntegerObject(t *testing.T, obj object.Object, expected int64) {

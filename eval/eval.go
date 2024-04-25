@@ -5,10 +5,13 @@ import (
 	"github.com/aziflaj/pingul/object"
 )
 
+var vt = object.NewVarTable()
+
 func Eval(node ast.Node) object.Object {
 	switch node := node.(type) {
 	case *ast.Program:
 		return evalProgram(node)
+
 	case *ast.BlockStatement:
 		return evalBlock(node)
 
@@ -26,6 +29,14 @@ func Eval(node ast.Node) object.Object {
 
 	case *ast.Nil:
 		return &object.Nil{}
+
+	case *ast.VarStatement:
+		val := Eval(node.Value)
+		vt.Set(node.Name.String(), val)
+		return val
+
+	case *ast.Identifier:
+		return vt.Get(node.String())
 
 	case *ast.PrefixExpression:
 		right := Eval(node.Right)
