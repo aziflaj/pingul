@@ -285,6 +285,37 @@ func TestFuncCalls(t *testing.T) {
 	}
 }
 
+func TestFibonacci(t *testing.T) {
+	fibonacci := `
+var fib = func(n) {
+	if (n <= 1) {
+		return n;
+	}
+
+	return fib(n - 1) + fib(n - 2);
+};`
+
+	testCases := []struct {
+		input    string
+		expected int64
+	}{
+		{fibonacci + "fib(0);", 0},
+		{fibonacci + "fib(1);", 1},
+		{fibonacci + "fib(2);", 1},
+		{fibonacci + "fib(3);", 2},
+		{fibonacci + "fib(4);", 3},
+		{fibonacci + "fib(5);", 5},
+		{fibonacci + "fib(6);", 8},
+		{fibonacci + "fib(7);", 13},
+		{fibonacci + "fib(8);", 21},
+	}
+
+	for _, tc := range testCases {
+		evaluated := evalProgram(tc.input)
+		assertIntegerObject(t, evaluated, tc.expected)
+	}
+}
+
 ///////// HELPER FUNCTIONS //////////
 
 func assertIntegerObject(t *testing.T, obj object.Object, expected int64) {

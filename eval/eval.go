@@ -31,10 +31,7 @@ func Eval(scope *object.Scope, node ast.Node) object.Object {
 		return &object.Nil{}
 
 	case *ast.FuncExpression:
-		fun := &object.Func{Params: node.Params, Body: node.Body}
-		funName := node.Token.String()
-		scope.Set(funName, fun)
-		return fun
+		return &object.Func{Params: node.Params, Body: node.Body}
 
 	case *ast.CallExpression:
 		// eval args, left to right
@@ -66,7 +63,7 @@ func Eval(scope *object.Scope, node ast.Node) object.Object {
 
 	case *ast.IfExpression:
 		cond := Eval(scope, node.Condition)
-		return evalIfExpression(cond.IsTruthy(), node.Consequence, node.Alternative)
+		return evalIfExpression(scope, cond.IsTruthy(), node.Consequence, node.Alternative)
 
 	default:
 		return &object.Nil{}
@@ -194,7 +191,7 @@ func evalIntegerInfixExpression(
 	return &object.Nil{}
 }
 
-func evalIfExpression(cond bool, consequence *ast.BlockStatement, alternative *ast.BlockStatement) object.Object {
+func evalIfExpression(scope *object.Scope, cond bool, consequence *ast.BlockStatement, alternative *ast.BlockStatement) object.Object {
 	if cond {
 		return Eval(scope, consequence)
 	}
@@ -215,7 +212,8 @@ func applyFunction(scope *object.Scope, fun object.Object, args []object.Object)
 	localScope := object.NewLocalScope(scope)
 
 	for i, param := range function.Params {
-		localScope.Set(param.String(), args[i])
+		p := param.String()
+		localScope.Set(p, args[i])
 	}
 
 	result := Eval(localScope, function.Body)
