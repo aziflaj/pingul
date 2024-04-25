@@ -261,6 +261,8 @@ func TestVarStatements(t *testing.T) {
 		{"var x = 5; x;", 5},
 		{"var x = 5; var y = 10; x + y;", 15},
 		{"var x = 5; var y = 10; var z = 15; x + y + z;", 30},
+		{"var x = 5; if (true) { var x = 10; return x; }", 10},
+		{"var x = 5; if (false) { var x = 10; return x; } return x;", 5},
 	}
 
 	for _, tc := range testCases {
@@ -272,42 +274,13 @@ func TestVarStatements(t *testing.T) {
 		assertIntegerObject(t, evaluated, tc.expected)
 	}
 
-	// Test variable shadowing
-	input := `
-var x = 5;
-if (true) {
-	var x = 10;
-	return x;
-}`
+	// test unasigned variable
+	input := `a;`
 	lxr := lexer.New(input)
 	psr := parser.New(lxr)
 	program := psr.ParseProgram()
 
 	evaluated := eval.Eval(program)
-	assertIntegerObject(t, evaluated, 10)
-
-	input = `
-var x = 5;
-if (false) {
-	var x = 10;
-	return x;
-}
-return x;`
-	lxr = lexer.New(input)
-	psr = parser.New(lxr)
-	program = psr.ParseProgram()
-
-	evaluated = eval.Eval(program)
-	assertIntegerObject(t, evaluated, 5)
-
-	// test unasigned variable
-	input = `a;`
-
-	lxr = lexer.New(input)
-	psr = parser.New(lxr)
-	program = psr.ParseProgram()
-
-	evaluated = eval.Eval(program)
 	_, ok := evaluated.(*object.Nil)
 	if !ok {
 		t.Fatalf("Expected nil object. Got=%v", evaluated)
