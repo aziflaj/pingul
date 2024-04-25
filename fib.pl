@@ -6,4 +6,4 @@ var fib = func(n) {
 	return fib(n - 1) + fib(n - 2);
 };
 
-fib(9);
+var result = fib(10);
