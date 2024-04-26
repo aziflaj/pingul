@@ -1,19 +1,34 @@
 # PinguL
 
-PinguL (short for Pingu-Lang) is a programming language that I'm creating for fun. It is a **somewhat functional**, **dynamically-typed**, **interpreted** language, with a simple syntax that borrows ideas as well as syntax from a bunch of languages:
-- JavaScript: It revives the `var` keyword, first-class functions, and (_accidentally_, blame my laziness) implements some weird type-related ~~shit~~ shenanigans
+PinguL (short for Pingu Lang) is a programming language that I'm creating for no other reason than _"because I can"_. It is a **somewhat functional**, **dynamically-typed**, **interpreted** language with a simple syntax, and it borrows ideas as well as syntax from a bunch of languages:
+
+- JavaScript: It revives the `var` keyword, supports first-class functions, and (_accidentally_, blame my laziness) implements some weird type-related ~~shit~~ shenanigans
 - Ruby: (almost) everything is an expression
-- Python: logical operators are named `and`, `or` and `not` instead of `&&`, `||` and `!`
+- Python: logical operators are `and`, `or` and `not` instead of `&&`, `||` and `!`
 - C: when working with booleans, `0` is evaluated to `false`, every other number to `true`
-- Go: a `func` keyword, the language is written in Go... idk what else
+- Go: a `func` keyword for functions, the interpreter & the ~~built-in~~ intrinsic functions are written in Go... idk what else
 
 <details>
 <summary>Why is it named like that?</summary>
-
-Because [Pingu](https://www.imdb.com/title/tt0100366/) is a great character and it deserves his own language. Any resemblance of PinguL (_TM pending_) with any Albanian puns is strictly coincidental and I didn't think of them before writing this. Here, have a Pingu GIF
+<br />
+  
+Because [Pingu](https://www.imdb.com/title/tt0100366/) is a great character and he deserves his own language. Any resemblance of PinguL (_TM pending_) with any Albanian puns is strictly coincidental and I didn't think of them before writing this. Here, have a Pingu GIF
 
 ![pingu](https://github.com/aziflaj/pingul/assets/5219775/6de2c555-1237-41ca-95fd-18349d2d247f)
+
 </details>
+
+Table of Contents
+=================
+ * [How to use PinguL](#how-to-use-pingul)
+ * [Comments](#comments)
+ * [Data Types](#data-types)
+    + [Integers and Booleans](#integers-and-booleans)
+    + [Strings](#strings)
+    + [~~Arrays~~ Lists](#arrays-lists)
+ * [Conditionals](#conditionals)
+ * [Functions](#functions)
+ * [Loops](#loops)
 
 ## How to use PinguL
 
@@ -22,11 +37,12 @@ You can use the REPL by doing `go run cmd/pingulcli/main.go`.
 You can run a source file by doing `go run cmd/pingulcc/main.go /path/to/file.pl`. Just like Perl and Prolog, PinguL files use the `.pl` extension. 
 
 ## Comments
-No. Just like in real life, nothing you say or do is ever ignored. So PinguL doesn't support comments. 
+No. In real life, out there in the wild, nothing you say or do is ever ignored. That's why PinguL does not support comments. 
 
-## Integers and Booleans
+## Data Types
+### Integers and Booleans
 
-Pingul supports Integers, as well as the typical operators around them:
+PinguL has support for Integers, as well as the typical operators you use with them:
 
 ```js
 (pingul)>> 1
@@ -51,7 +67,7 @@ INT(-2)
 INT(3)
 ```
 
-It also supports Booleans, as well as the typical operators around them:
+It also supports Booleans:
 
 ```js
 (pingul)>> true
@@ -92,7 +108,7 @@ INT(0)
 INT(11)
 ```
 
-Notice the wording: "_evaluated to `true`_". They're not `true` per se, they just roleplay as true in some cases. For example, 3 **is not** `true`, but:
+Notice the wording: "_evaluated to `true`_". They're not `true` per se, they just roleplay as true in some cases. For example, 3 **is not** `true`, and it's also not false, but it still gets evaluated to true when used in conditionals:
 
 ```js
 (pingul)>> 3 == true
@@ -105,10 +121,10 @@ BOOL(false)
 STRING(hello)
 ```
 
-## Strings
+### Strings
 
-Yes, there are Strings in PinguL, and they can be concatenated using `+` and now I have one more reason to mock on PHP:
-
+Yes, there are Strings in PinguL. And yes, they can be concatenated using `+`. You now have one more reason to troll PHP developers:
+ 
 ```js
 (pingul)>> var name = "James"
 STRING(James)
@@ -127,7 +143,7 @@ See the `len` function? It's an [intrinsic](https://www.merriam-webster.com/dict
 
 > Your language calls them "built-in functions", and it sounds... boring. We call them _Intrinsic Functions_ here, it sounds deeper and more hardcore.
 
-## ~~Arrays~~ Lists
+### ~~Arrays~~ Lists
 
 We call them lists here but yes, PinguL supports them too:
 
@@ -177,18 +193,30 @@ STRING(math still works)
 NIL
 ```
 
-Q: Can we do `if`-`else if`-`else` statements?
-A: No. Deal with it.
+Q: Can we do `if`-`else if`-`else` statements? <br />
+A: No. Deal with it... But you can do the following and it would behave the same
 
-Q: What is that `NIL` at the end?
-A: PinguL also supports the [billion dollar mistake](https://www.infoq.com/presentations/Null-References-The-Billion-Dollar-Mistake-Tony-Hoare/). The `print` function doesn't return a value, so that's why you see that `NIL` at the end there
+```js
+if (cond1) {
+  ...
+} else {
+  if (cond2) {
+    ...
+  } else {
+    ...
+  }
+}
+```
 
-Q: Return? So you can do functions in PinguL?
-A: Absolutely, my imaginary friend!
+Q: What is that `NIL` I see at the end of REPL? <br />
+A: It's a hint to the [billion dollar mistake](https://www.infoq.com/presentations/Null-References-The-Billion-Dollar-Mistake-Tony-Hoare/). PinguL has support for null values, we call them `nil` (like Go and Ruby). The `print` function doesn't return a value, so that's why you see that `NIL` at the end there.
+
+Q: Return? So you can do functions in PinguL? <br />
+A: Absolutely!
 
 ## Functions
 
-PinguL only supports first-class functions. Take a look at `examples/fib.pl`:
+PinguL supports first-class functions. Take a look at [`examples/fib.pl`](https://github.com/aziflaj/pingul/blob/main/examples/fib.pl):
 
 ```js
 var fib = func(n) {
@@ -211,7 +239,7 @@ Thirdly, `if-else` is an expression, it gets evaluated to some value. That's why
 
 ## Loops
 
-There are no loops. But where there's will, there's a way. There's a way to implement Map-Reduce in PinguL (refer to `examples/map_reduce.pl`):
+There are no loops. But where there's a will, there's a way. And there's a way to implement Map-Reduce in PinguL (refer to [`examples/map_reduce.pl`](https://github.com/aziflaj/pingul/blob/main/examples/map_reduce.pl)):
 
 ```js
 var map = func(list, fun) {
@@ -237,7 +265,7 @@ var reduce = func(list, fun, initial) {
 }
 ```
 
-And these can then be used as this:
+These Map/Reduce functions can then be used as this:
 
 ```js
 var nums = [1, 2, 3, 4, 5];
