@@ -27,6 +27,9 @@ func Eval(scope *object.Scope, node ast.Node) object.Object {
 	case *ast.Boolean:
 		return &object.Boolean{Value: node.Value}
 
+	case *ast.String:
+		return &object.String{Value: node.Value}
+
 	case *ast.Nil:
 		return &object.Nil{}
 
@@ -113,6 +116,12 @@ func evalPrefixExpression(operator string, right object.Object) object.Object {
 // if left value is bool, all is bool
 // if left value is int, all is int
 func evalInfixExpression(operator string, left object.Object, right object.Object) object.Object {
+	if left.Type() == object.STRING && right.Type() == object.STRING {
+		if operator == "+" {
+			return &object.String{Value: append(left.(*object.String).Value, right.(*object.String).Value...)}
+		}
+	}
+
 	if left.Type() == object.INT {
 		// transform right value to integer
 		if right.Type() == object.BOOL {

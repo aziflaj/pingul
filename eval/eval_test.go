@@ -40,6 +40,48 @@ func TestEvalBool(t *testing.T) {
 	}
 }
 
+func TestEvalString(t *testing.T) {
+	testCases := []struct {
+		input    string
+		expected string
+	}{
+		{`"hello"`, "hello"},
+		{`"world"`, "world"},
+		{`"hello" + " " + "world"`, "hello world"},
+	}
+
+	for _, tc := range testCases {
+		evaluated := evalProgram(tc.input)
+		str, ok := evaluated.(*object.String)
+		if !ok {
+			t.Fatalf("Object is not a String. Got=%T", evaluated)
+		}
+
+		if string(str.Value) != tc.expected {
+			t.Fatalf("Object has wrong value. Got=%s, Expected=%s", string(str.Value), tc.expected)
+		}
+	}
+}
+
+func TestStringConcat(t *testing.T) {
+	input := `
+var name = "James";
+var surname = "Bond";
+var fullName = name + " " + surname;
+fullName;`
+
+	evaluated := evalProgram(input)
+	str, ok := evaluated.(*object.String)
+	if !ok {
+		t.Fatalf("Object is not a String. Got=%T", evaluated)
+	}
+
+	expected := "James Bond"
+	if string(str.Value) != expected {
+		t.Fatalf("Object has wrong value. Got=%s, Expected=%s", string(str.Value), expected)
+	}
+}
+
 func TestPrefixBoolNegation(t *testing.T) {
 	testCases := []struct {
 		input    string

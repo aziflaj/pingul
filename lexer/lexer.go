@@ -43,15 +43,18 @@ func (l *Lexer) NextToken() token.Token {
 		tkn.Type = token.Keywords[string(tkn.Literal)]
 	case token.IsComparisonOperator(tkn.Literal):
 		tkn.Type = token.ComparisonOperators[string(tkn.Literal)]
-
 	case token.IsInteger(tkn.Literal):
 		tkn.Type = token.INT
-	// TODO: Chars should be inside quotes
-	// case token.IsCharacter(tkn.Literal):
-	// 	tkn.Type = token.CHAR
 
 	default:
-		tkn.Type = token.IDENTIFIER
+		if tkn.Literal[0] == '"' {
+			tkn.Type = token.STRING
+			// strip the quotes from the string
+			tkn.Literal = tkn.Literal[1 : len(tkn.Literal)-1]
+		} else {
+			tkn.Type = token.IDENTIFIER
+		}
+
 	}
 
 getNextToken:
@@ -73,14 +76,19 @@ func (l *Lexer) readChar() {
 
 func (l *Lexer) readNextToken() []rune {
 	var word []rune
+	var readingString bool // read strings in full, even if they contain spaces
 
 	for l.ch != 0 {
-		if l.ch == ' ' || l.ch == '\n' || l.ch == '\t' {
+		if l.ch == '"' {
+			readingString = !readingString
+		}
+
+		if !readingString && (l.ch == ' ' || l.ch == '\n' || l.ch == '\t') {
 			break
 		}
 
 		// check if current character is an unary operator
-		if _, ok := token.UnaryOperators[l.ch]; ok {
+		if _, ok := token.UnaryOperators[l.ch]; ok && !readingString {
 			// take a step back and process unary operator in the next iteration
 			if len(word) > 0 {
 				l.position -= 1
@@ -92,7 +100,7 @@ func (l *Lexer) readNextToken() []rune {
 			}
 		}
 
-		if _, ok := token.Delimiters[l.ch]; ok {
+		if _, ok := token.Delimiters[l.ch]; ok && !readingString {
 			// take a step back and process delimiter in the next iteration
 			if len(word) > 0 {
 				l.position -= 1

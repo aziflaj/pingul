@@ -67,6 +67,7 @@ func New(lxr *lexer.Lexer) *Parser {
 	p.prefixParseHandlers = map[token.TokenType]prefixParseHandler{
 		token.IDENTIFIER: p.parseIdentifier,
 		token.INT:        p.parseIntegerLiteral,
+		token.STRING:     p.parseString,
 		token.NOT:        p.parsePrefixExpression,
 		token.MINUS:      p.parsePrefixExpression,
 		token.TRUE:       p.parseBoolean,
@@ -249,6 +250,10 @@ func (p *Parser) parseIntegerLiteral() ast.Expression {
 	}
 
 	return &ast.IntegerLiteral{Token: p.currentToken, Value: val}
+}
+
+func (p *Parser) parseString() ast.Expression {
+	return &ast.String{Token: p.currentToken, Value: p.currentToken.Literal}
 }
 
 func (p *Parser) parsePrefixExpression() ast.Expression {

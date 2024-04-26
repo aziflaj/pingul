@@ -16,7 +16,7 @@ const (
 	// Identifiers & Literals
 	IDENTIFIER
 	INT
-	CHAR
+	STRING
 
 	// Operators
 	ASSIGNMENT
@@ -153,7 +153,7 @@ func (t Token) String() string {
 		EOF:                   "EOF",
 		IDENTIFIER:            "IDENTIFIER",
 		INT:                   "INT",
-		CHAR:                  "CHAR",
+		STRING:                "STRING",
 		ASSIGNMENT:            "=",
 		PLUS:                  "+",
 		MINUS:                 "-",

@@ -12,6 +12,7 @@ type ObjectType string
 const (
 	INT    = ObjectType("INT")
 	BOOL   = ObjectType("BOOL")
+	STRING = ObjectType("STRING")
 	NIL    = ObjectType("NIL")
 	RETURN = ObjectType("RETURN")
 	FUNC   = ObjectType("FUNC")
@@ -39,6 +40,14 @@ type Boolean struct {
 func (b *Boolean) Type() ObjectType { return BOOL }
 func (b *Boolean) Inspect() string  { return fmt.Sprintf("%s(%t)", b.Type(), b.Value) }
 func (b *Boolean) IsTruthy() bool   { return b.Value }
+
+type String struct {
+	Value []rune
+}
+
+func (s *String) Type() ObjectType { return STRING }
+func (s *String) Inspect() string  { return fmt.Sprintf("%s(%s)", s.Type(), string(s.Value)) }
+func (s *String) IsTruthy() bool   { return string(s.Value) != "" }
 
 type Nil struct{}
 

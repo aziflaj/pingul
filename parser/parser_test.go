@@ -205,6 +205,32 @@ func TestParseIntegerLiterals(t *testing.T) {
 	}
 }
 
+func TestParseString(t *testing.T) {
+	input := `"Hello, World!"`
+
+	lxr := lexer.New(input)
+	p := parser.New(lxr)
+	program := p.ParseProgram()
+
+	assertProgram(t, program)
+	assertProgramLength(t, program, 1)
+
+	exprStmt, ok := program.Statements[0].(*ast.ExpressionStatement)
+	if !ok {
+		t.Fatalf("program.Statements[0] is not *ast.ExpressionStatement. Got=%T",
+			program.Statements[0])
+	}
+
+	strExpr, ok := exprStmt.Expression.(*ast.String)
+	if !ok {
+		t.Fatalf("expression is not *ast.String. Got=%T", exprStmt.Expression)
+	}
+
+	if string(strExpr.Value) != "Hello, World!" {
+		t.Errorf("strExpr.Value not 'Hello, World!'. Got=%v", string(strExpr.Value))
+	}
+}
+
 func TestParsePrefixExpressions(t *testing.T) {
 	testCases := []struct {
 		input    string

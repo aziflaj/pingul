@@ -8,7 +8,8 @@ import (
 )
 
 func TestNextToken(t *testing.T) {
-	input := `var age = 28;
+	input := `var fullName = "Mr. Squarepants, Spongebob";
+var age = 28;
 var timeGoesBy = func(currentAge, yearsPassed) {
 	return currentAge + yearsPassed;
 };
@@ -33,6 +34,12 @@ var z = x + y;`
 		expectedType    token.TokenType
 		expectedLiteral []rune
 	}{
+		{token.VAR, []rune("var")},
+		{token.IDENTIFIER, []rune("fullName")},
+		{token.ASSIGNMENT, []rune("=")},
+		{token.STRING, []rune("Mr. Squarepants, Spongebob")},
+		{token.SEMICOLON, []rune(";")},
+
 		{token.VAR, []rune("var")},
 		{token.IDENTIFIER, []rune("age")},
 		{token.ASSIGNMENT, []rune("=")},
