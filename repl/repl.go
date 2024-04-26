@@ -14,7 +14,7 @@ import (
 const PROMPT = "(pingul)>> "
 
 func Start(in io.Reader, out io.Writer) {
-	fmt.Printf("Welcome to the Pingul REPL!\n")
+	fmt.Printf("Welcome to the PinguL REPL!\n")
 	fmt.Printf("Type 'exit' to quit the REPL.\n")
 
 	globalScope := object.NewScope()
