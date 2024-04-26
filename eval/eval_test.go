@@ -82,6 +82,41 @@ fullName;`
 	}
 }
 
+func TestLists(t *testing.T) {
+	testCases := []struct {
+		input    string
+		expected []int64
+	}{
+		{"[]", []int64{}},
+		{"[1, 2, 3]", []int64{1, 2, 3}},
+		{"[1 + 2, 3 * 4, 5 - 6]", []int64{3, 12, -1}},
+	}
+
+	for _, tc := range testCases {
+		evaluated := evalProgram(tc.input)
+		list, ok := evaluated.(*object.List)
+		if !ok {
+			t.Fatalf("Object is not a List. Got=%T", evaluated)
+		}
+
+		if len(list.Items) != len(tc.expected) {
+			t.Fatalf("List has wrong length. Got=%d, Expected=%d", len(list.Items), len(tc.expected))
+		}
+
+		for i, item := range list.Items {
+			integer, ok := item.(*object.Integer)
+			if !ok {
+				t.Fatalf("Object is not an Integer. Got=%T", item)
+			}
+
+			if integer.Value != tc.expected[i] {
+				t.Fatalf("Object has wrong value. Got=%d, Expected=%d",
+					integer.Value, tc.expected[i])
+			}
+		}
+	}
+}
+
 func TestPrefixBoolNegation(t *testing.T) {
 	testCases := []struct {
 		input    string
@@ -324,6 +359,28 @@ func TestFuncCalls(t *testing.T) {
 		t.Logf("Running test case: %s", tc.input)
 		evaluated := evalProgram(tc.input)
 		assertIntegerObject(t, evaluated, tc.expected)
+	}
+}
+
+func TestIntrinsicFuncs(t *testing.T) {
+	testCases := []struct {
+		input    string
+		expected int64
+	}{
+		{`len("Hello, World!");`, 13},
+		{`len([1, 2, 3]);`, 3},
+	}
+
+	for _, tc := range testCases {
+		evaluated := evalProgram(tc.input)
+		str, ok := evaluated.(*object.Integer)
+		if !ok {
+			t.Fatalf("Expected String object. Got=%v", evaluated)
+		}
+
+		if str.Value != tc.expected {
+			t.Fatalf("Expected %d. Got=%d", tc.expected, str.Value)
+		}
 	}
 }
 

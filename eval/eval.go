@@ -15,9 +15,6 @@ func Eval(scope *object.Scope, node ast.Node) object.Object {
 	case *ast.BlockStatement:
 		return evalBlock(scope, node)
 
-	case *ast.ReturnStatement:
-		return &object.Return{Value: Eval(scope, node.ReturnValue)}
-
 	case *ast.ExpressionStatement:
 		return Eval(scope, node.Expression)
 
@@ -30,8 +27,20 @@ func Eval(scope *object.Scope, node ast.Node) object.Object {
 	case *ast.String:
 		return &object.String{Value: node.Value}
 
+	case *ast.List:
+		list := &object.List{Items: make([]object.Object, len(node.Items))}
+
+		for i, item := range node.Items {
+			list.Items[i] = Eval(scope, item)
+		}
+
+		return list
+
 	case *ast.Nil:
 		return &object.Nil{}
+
+	case *ast.ReturnStatement:
+		return &object.Return{Value: Eval(scope, node.ReturnValue)}
 
 	case *ast.FuncExpression:
 		return &object.Func{Params: node.Params, Body: node.Body}

@@ -28,7 +28,8 @@ var amIAlive = true and not false;
 
 var x = 1;
 var y = -x;
-var z = x + y;`
+var z = x + y;
+var list = [1, 2, 3];`
 
 	tests := []struct {
 		expectedType    token.TokenType
@@ -161,6 +162,18 @@ var z = x + y;`
 		{token.IDENTIFIER, []rune("x")},
 		{token.PLUS, []rune("+")},
 		{token.IDENTIFIER, []rune("y")},
+		{token.SEMICOLON, []rune(";")},
+
+		{token.VAR, []rune("var")},
+		{token.IDENTIFIER, []rune("list")},
+		{token.ASSIGNMENT, []rune("=")},
+		{token.LBRACKET, []rune("[")},
+		{token.INT, []rune("1")},
+		{token.COMMA, []rune(",")},
+		{token.INT, []rune("2")},
+		{token.COMMA, []rune(",")},
+		{token.INT, []rune("3")},
+		{token.RBRACKET, []rune("]")},
 		{token.SEMICOLON, []rune(";")},
 
 		{token.EOF, []rune("")},

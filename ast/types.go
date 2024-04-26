@@ -1,6 +1,10 @@
 package ast
 
-import "github.com/aziflaj/pingul/token"
+import (
+	"strings"
+
+	"github.com/aziflaj/pingul/token"
+)
 
 type IntegerLiteral struct {
 	Token token.Token // the token.INT token
@@ -52,4 +56,29 @@ func (n *Nil) TokenLiteral() []rune {
 }
 func (n *Nil) String() string {
 	return string(n.Token.Literal)
+}
+
+type List struct {
+	Token token.Token
+	Items []Expression
+}
+
+func (l *List) expressionNode() {}
+func (l *List) TokenLiteral() []rune {
+	return l.Token.Literal
+}
+func (l *List) String() string {
+	var b strings.Builder
+
+	b.WriteString("[")
+	for i, item := range l.Items {
+		b.WriteString(item.String())
+
+		if i < len(l.Items)-1 {
+			b.WriteString(", ")
+		}
+	}
+	b.WriteString("]")
+
+	return b.String()
 }

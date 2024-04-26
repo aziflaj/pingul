@@ -74,6 +74,7 @@ func New(lxr *lexer.Lexer) *Parser {
 		token.FALSE:      p.parseBoolean,
 		token.NIL:        p.parseNilLiteral,
 		token.LPAREN:     p.parseGroupExpressions,
+		token.LBRACKET:   p.parseList,
 		token.IF:         p.parseIfExpression,
 		token.FUNC:       p.parseFuncExpression,
 	}
@@ -303,6 +304,28 @@ func (p *Parser) parseGroupExpressions() ast.Expression {
 	}
 
 	return parsedExpr
+}
+
+func (p *Parser) parseList() ast.Expression {
+	list := &ast.List{Token: p.currentToken}
+
+	for p.peekToken.Type != token.RBRACKET {
+		p.nextToken()
+		list.Items = append(list.Items, p.parseExpression(LOWEST))
+
+		if p.peekToken.Type == token.COMMA {
+			p.nextToken()
+		}
+	}
+
+	if p.peekToken.Type != token.RBRACKET {
+		p.errors = append(p.errors, "Expected ']' after list items")
+		return nil
+	}
+
+	p.nextToken() // skip the closing bracket
+
+	return list
 }
 
 func (p *Parser) parseIfExpression() ast.Expression {

@@ -13,6 +13,7 @@ const (
 	INT            = ObjectType("INT")
 	BOOL           = ObjectType("BOOL")
 	STRING         = ObjectType("STRING")
+	LIST           = ObjectType("LIST")
 	NIL            = ObjectType("NIL")
 	RETURN         = ObjectType("RETURN")
 	FUNC           = ObjectType("FUNC")
@@ -49,6 +50,27 @@ type String struct {
 func (s *String) Type() ObjectType { return STRING }
 func (s *String) Inspect() string  { return fmt.Sprintf("%s(%s)", s.Type(), string(s.Value)) }
 func (s *String) IsTruthy() bool   { return string(s.Value) != "" }
+
+type List struct {
+	Items []Object
+}
+
+func (l *List) Type() ObjectType { return LIST }
+func (l *List) Inspect() string {
+	var b strings.Builder
+
+	b.WriteString("[")
+	for i, e := range l.Items {
+		b.WriteString(e.Inspect())
+		if i < len(l.Items)-1 {
+			b.WriteString(", ")
+		}
+	}
+	b.WriteString("]")
+
+	return b.String()
+}
+func (l *List) IsTruthy() bool { return len(l.Items) > 0 }
 
 type Nil struct{}
 

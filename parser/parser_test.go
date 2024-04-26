@@ -231,6 +231,49 @@ func TestParseString(t *testing.T) {
 	}
 }
 
+func TestParseList(t *testing.T) {
+	testCases := []struct {
+		input    string
+		expected []interface{}
+	}{
+		{"[]", []interface{}{}},
+		{"[1]", []interface{}{1}},
+		{"[1, 2]", []interface{}{1, 2}},
+		{"[1, 2, 3]", []interface{}{1, 2, 3}},
+	}
+
+	for _, tc := range testCases {
+		lxr := lexer.New(tc.input)
+		p := parser.New(lxr)
+		program := p.ParseProgram()
+
+		assertProgram(t, program)
+		assertProgramLength(t, program, 1)
+
+		exprStmt, ok := program.Statements[0].(*ast.ExpressionStatement)
+		if !ok {
+			t.Fatalf("program.Statements[0] is not *ast.ExpressionStatement. Got=%T",
+				program.Statements[0])
+		}
+
+		listExpr, ok := exprStmt.Expression.(*ast.List)
+		if !ok {
+			t.Fatalf("expression is not *ast.List. Got=%T", exprStmt.Expression)
+		}
+
+		if len(listExpr.Items) != len(tc.expected) {
+			t.Errorf("listExpr.Items does not have %d elements. Got=%d",
+				len(tc.expected), len(listExpr.Items))
+		}
+
+		for i, item := range listExpr.Items {
+			if !testLiteralExpression(t, item, tc.expected[i]) {
+				return
+			}
+		}
+	}
+}
+
 func TestParsePrefixExpressions(t *testing.T) {
 	testCases := []struct {
 		input    string

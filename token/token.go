@@ -40,6 +40,8 @@ const (
 
 	LPAREN
 	RPAREN
+	LBRACKET
+	RBRACKET
 	LBRACE
 	RBRACE
 
@@ -74,6 +76,8 @@ var Keywords = map[string]TokenType{
 var Delimiters = map[rune]TokenType{
 	'(': LPAREN,
 	')': RPAREN,
+	'[': LBRACKET,
+	']': RBRACKET,
 	'{': LBRACE,
 	'}': RBRACE,
 	',': COMMA,
@@ -170,6 +174,8 @@ func (t Token) String() string {
 		SEMICOLON:             ";",
 		LPAREN:                "(",
 		RPAREN:                ")",
+		LBRACKET:              "[",
+		RBRACKET:              "]",
 		LBRACE:                "{",
 		RBRACE:                "}",
 		NIL:                   "nil",
