@@ -17,6 +17,8 @@ func Start(in io.Reader, out io.Writer) {
 	fmt.Printf("Welcome to the Pingul REPL!\n")
 	fmt.Printf("Type 'exit' to quit the REPL.\n")
 
+	globalScope := object.NewScope()
+
 	for {
 		fmt.Fprintf(out, PROMPT)
 
@@ -47,7 +49,6 @@ func Start(in io.Reader, out io.Writer) {
 			continue
 		}
 
-		globalScope := object.NewScope()
 		result := eval.Eval(globalScope, program)
 
 		fmt.Fprintf(out, result.Inspect())

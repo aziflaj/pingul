@@ -10,12 +10,13 @@ import (
 type ObjectType string
 
 const (
-	INT    = ObjectType("INT")
-	BOOL   = ObjectType("BOOL")
-	STRING = ObjectType("STRING")
-	NIL    = ObjectType("NIL")
-	RETURN = ObjectType("RETURN")
-	FUNC   = ObjectType("FUNC")
+	INT            = ObjectType("INT")
+	BOOL           = ObjectType("BOOL")
+	STRING         = ObjectType("STRING")
+	NIL            = ObjectType("NIL")
+	RETURN         = ObjectType("RETURN")
+	FUNC           = ObjectType("FUNC")
+	INTRINSIC_FUNC = ObjectType("INTRINSIC_FUNC")
 )
 
 type Object interface {
@@ -86,3 +87,9 @@ func (f *Func) Inspect() string {
 
 	return b.String()
 }
+
+type IntrinsicFunc func(args ...Object) Object
+
+func (i IntrinsicFunc) Type() ObjectType { return INTRINSIC_FUNC }
+func (i IntrinsicFunc) IsTruthy() bool   { return true }
+func (i IntrinsicFunc) Inspect() string  { return "func(...) { intrinsic }" }

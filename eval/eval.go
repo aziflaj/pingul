@@ -53,6 +53,13 @@ func Eval(scope *object.Scope, node ast.Node) object.Object {
 		return val
 
 	case *ast.Identifier:
+		// try the intrinsic functions first
+		ident, ok := object.IntrinsicFuncs[node.String()]
+
+		if ok {
+			return ident
+		}
+
 		return scope.Get(node.String())
 
 	case *ast.PrefixExpression:
@@ -213,6 +220,10 @@ func evalIfExpression(scope *object.Scope, cond bool, consequence *ast.BlockStat
 }
 
 func applyFunction(scope *object.Scope, fun object.Object, args []object.Object) object.Object {
+	if fun.Type() == object.INTRINSIC_FUNC {
+		return fun.(object.IntrinsicFunc)(args...)
+	}
+
 	if fun.Type() != object.FUNC {
 		return &object.Nil{}
 	}
