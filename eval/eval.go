@@ -36,6 +36,16 @@ func Eval(scope *object.Scope, node ast.Node) object.Object {
 
 		return list
 
+	case *ast.IndexExpression:
+		list := Eval(scope, node.List)
+		index := Eval(scope, node.Index)
+
+		if list.Type() == object.LIST && index.Type() == object.INT {
+			return list.(*object.List).Items[index.(*object.Integer).Value]
+		}
+
+		return &object.Nil{}
+
 	case *ast.Nil:
 		return &object.Nil{}
 

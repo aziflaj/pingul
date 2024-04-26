@@ -57,6 +57,29 @@ func (i *InfixExpression) String() string {
 	return b.String()
 }
 
+// <expression>[<expression>]
+type IndexExpression struct {
+	Token token.Token // the '[' token
+	List  Expression
+	Index Expression
+}
+
+func (i *IndexExpression) expressionNode() {}
+func (i *IndexExpression) TokenLiteral() []rune {
+	return i.Token.Literal
+}
+func (i *IndexExpression) String() string {
+	var b strings.Builder
+
+	b.WriteString("(")
+	b.WriteString(i.List.String())
+	b.WriteString("[")
+	b.WriteString(i.Index.String())
+	b.WriteString("])")
+
+	return b.String()
+}
+
 // if (<expression>) <block> else <block>
 type IfExpression struct {
 	Token       token.Token // the 'if' token

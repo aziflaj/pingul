@@ -20,6 +20,7 @@ const (
 	PRODUCT // *
 	PREFIX  // `-x`, `not x`
 	FUNCALL // function call
+	INDEX   // list[index]
 )
 
 var precedences = map[token.TokenType]OpPrecedence{
@@ -38,7 +39,8 @@ var precedences = map[token.TokenType]OpPrecedence{
 	token.DIVIDE:   PRODUCT,
 	token.MODULUS:  PRODUCT,
 
-	token.LPAREN: FUNCALL,
+	token.LPAREN:   FUNCALL,
+	token.LBRACKET: INDEX,
 }
 
 type (
@@ -95,7 +97,8 @@ func New(lxr *lexer.Lexer) *Parser {
 		token.DIVIDE:   p.parseInfixExpression,
 		token.MODULUS:  p.parseInfixExpression,
 
-		token.LPAREN: p.parseFuncCall,
+		token.LPAREN:   p.parseFuncCall,
+		token.LBRACKET: p.parseIndexExpression,
 	}
 
 	return p
@@ -474,4 +477,20 @@ func (p *Parser) parseFuncCallArgs() []ast.Expression {
 	p.nextToken()
 
 	return args
+}
+
+func (p *Parser) parseIndexExpression(left ast.Expression) ast.Expression {
+	expr := &ast.IndexExpression{Token: p.currentToken, List: left}
+
+	p.nextToken()
+	expr.Index = p.parseExpression(LOWEST)
+
+	if p.peekToken.Type != token.RBRACKET {
+		p.errors = append(p.errors, "Expected ']' after index")
+		return nil
+	}
+
+	p.nextToken()
+
+	return expr
 }

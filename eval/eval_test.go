@@ -117,6 +117,25 @@ func TestLists(t *testing.T) {
 	}
 }
 
+func TestListIndex(t *testing.T) {
+	testCases := []struct {
+		input    string
+		expected int64
+	}{
+		{"[1, 2, 3][0]", 1},
+		{"[1, 2, 3][1]", 2},
+		{"[1, 2, 3][2]", 3},
+		{"var list = [1, 2, 3]; list[2 - 1];", 2},
+		{"var list = [1, 2, 3]; var idx = 1; list[idx];", 2},
+		{"var list = [1, 2, 3]; var idx = 1; list[idx] + list[idx - 1]", 3},
+	}
+
+	for _, tc := range testCases {
+		evaluated := evalProgram(tc.input)
+		assertIntegerObject(t, evaluated, tc.expected)
+	}
+}
+
 func TestPrefixBoolNegation(t *testing.T) {
 	testCases := []struct {
 		input    string

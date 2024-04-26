@@ -274,6 +274,37 @@ func TestParseList(t *testing.T) {
 	}
 }
 
+func TestParseIndexExpressions(t *testing.T) {
+	input := "myList[1]"
+
+	lxr := lexer.New(input)
+	p := parser.New(lxr)
+	program := p.ParseProgram()
+
+	assertProgram(t, program)
+	checkParserErrors(t, p)
+	assertProgramLength(t, program, 1)
+
+	exprStmt, ok := program.Statements[0].(*ast.ExpressionStatement)
+	if !ok {
+		t.Fatalf("program.Statements[0] is not *ast.ExpressionStatement. Got=%T",
+			program.Statements[0])
+	}
+
+	indexExpr, ok := exprStmt.Expression.(*ast.IndexExpression)
+	if !ok {
+		t.Fatalf("expression is not *ast.IndexExpression. Got=%T", exprStmt.Expression)
+	}
+
+	if !testIdentifier(t, indexExpr.List, "myList") {
+		return
+	}
+
+	if !testLiteralExpression(t, indexExpr.Index, 1) {
+		return
+	}
+}
+
 func TestParsePrefixExpressions(t *testing.T) {
 	testCases := []struct {
 		input    string
@@ -388,6 +419,8 @@ func TestOperatorPrecedenceParsing(t *testing.T) {
 		{"fib(5, fib(4))", "fib(5, fib(4))"},
 		{"fib(5, fib(4), fib(3 + (2 + 1))", "fib(5, fib(4), fib((3 + (2 + 1))))"},
 		{"add(a + b + c * d / f + g)", "add((((a + b) + ((c * d) / f)) + g))"},
+		{"a * [1, 2, 3, 4][b * c] * d", "((a * ([1, 2, 3, 4][(b * c)])) * d)"},
+		{"add(a * b[2], b[1], 2 * [1, 2][1])", "add((a * (b[2])), (b[1]), (2 * ([1, 2][1])))"},
 	}
 
 	for index, tt := range tests {
