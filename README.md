@@ -1,12 +1,12 @@
 # PinguL
 
-PinguL (short for Pingu Lang) is a programming language that I'm creating for no other reason than _"because I can"_. It is a **somewhat functional**, **dynamically-typed**, **interpreted** language with a simple syntax, and it borrows ideas as well as syntax from a bunch of languages:
+PinguL (short for Pingu Lang) is a programming language that I'm creating for no other reason than _"because I can"_. It is a **somewhat functional**, **dynamically-typed**, **interpreted**, **Garbage Collected** language with a simple syntax, and it borrows ideas as well as syntax from a bunch of languages:
 
 - JavaScript: It revives the `var` keyword, supports first-class functions, and (_accidentally_, blame my laziness) implements some weird type-related ~~shit~~ shenanigans
 - Ruby: (almost) everything is an expression
 - Python: logical operators are `and`, `or` and `not` instead of `&&`, `||` and `!`
 - C: when working with booleans, `0` is evaluated to `false`, every other number to `true`
-- Go: a `func` keyword for functions, the interpreter & the ~~built-in~~ intrinsic functions are written in Go... idk what else
+- Go: a `func` keyword for functions, the interpreter & the ~~built-in~~ intrinsic functions are written in Go, it uses Go's Garbage Collector... idk what else
 
 <details>
 <summary>Why is it named like that?</summary>
