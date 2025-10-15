@@ -143,9 +143,21 @@ func evalPrefixExpression(operator string, right object.Object) object.Object {
 // if left value is int, all is int
 func evalInfixExpression(operator string, left object.Object, right object.Object) object.Object {
 	if left.Type() == object.STRING && right.Type() == object.STRING {
-		if operator == "+" {
-			return &object.String{Value: append(left.(*object.String).Value, right.(*object.String).Value...)}
+		switch operator {
+		case "+":
+			return &object.String{
+				Value: append(left.(*object.String).Value, right.(*object.String).Value...),
+			}
+		case "==":
+			return &object.Boolean{
+				Value: string(left.(*object.String).Value) == string(right.(*object.String).Value),
+			}
+		case "!=":
+			return &object.Boolean{
+				Value: string(left.(*object.String).Value) != string(right.(*object.String).Value),
+			}
 		}
+		return &object.Nil{}
 	}
 
 	if left.Type() == object.INT {
