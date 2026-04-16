@@ -8,7 +8,7 @@ import (
 
 // { key: value, key2: value2, ... }
 type ObjectLiteral struct {
-	Token token.Token      // the '{' token
+	Token token.Token // the '{' token
 	Pairs map[string]Expression
 }
 

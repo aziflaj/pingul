@@ -14,7 +14,7 @@ func TestVarStatements(t *testing.T) {
 	testCases := []struct {
 		input      string
 		identifier string
-		value      interface{}
+		value      any
 	}{
 		{"var age = 28;", "age", 28},
 		{"var foo = bar;", "foo", "bar"},
@@ -87,7 +87,7 @@ func TestParseErrors(t *testing.T) {
 func TestReturnStatements(t *testing.T) {
 	testCases := []struct {
 		input    string
-		expected interface{}
+		expected any
 	}{
 		{"return 5;", 5},
 		{"return fubar;", "fubar"},
@@ -234,12 +234,12 @@ func TestParseString(t *testing.T) {
 func TestParseList(t *testing.T) {
 	testCases := []struct {
 		input    string
-		expected []interface{}
+		expected []any
 	}{
-		{"[]", []interface{}{}},
-		{"[1]", []interface{}{1}},
-		{"[1, 2]", []interface{}{1, 2}},
-		{"[1, 2, 3]", []interface{}{1, 2, 3}},
+		{"[]", []any{}},
+		{"[1]", []any{1}},
+		{"[1, 2]", []any{1, 2}},
+		{"[1, 2, 3]", []any{1, 2, 3}},
 	}
 
 	for _, tc := range testCases {
@@ -309,7 +309,7 @@ func TestParsePrefixExpressions(t *testing.T) {
 	testCases := []struct {
 		input    string
 		operator string
-		value    interface{}
+		value    any
 	}{
 		{"not 5;", "not", 5},
 		{"-15;", "-", 15},
@@ -350,9 +350,9 @@ func TestParsePrefixExpressions(t *testing.T) {
 func TestParseInfixExpressions(t *testing.T) {
 	testCases := []struct {
 		input    string
-		left     interface{}
+		left     any
 		operator string
-		right    interface{}
+		right    any
 	}{
 		{"5 + 5;", 5, "+", 5},
 		{"5 - 5;", 5, "-", 5},
@@ -655,7 +655,7 @@ func testVarStatement(t *testing.T, s ast.Statement, name string) bool {
 	return true
 }
 
-func testLiteralExpression(t *testing.T, expr ast.Expression, expected interface{}) bool {
+func testLiteralExpression(t *testing.T, expr ast.Expression, expected any) bool {
 	switch v := expected.(type) {
 	case int:
 		return testIntegerLiteral(t, expr, int64(v))
@@ -733,7 +733,7 @@ func testIdentifier(t *testing.T, expr ast.Expression, value string) bool {
 func testInfixExpression(
 	t *testing.T,
 	expr ast.Expression,
-	left interface{}, operator string, right interface{},
+	left any, operator string, right any,
 ) bool {
 	infixExpr, ok := expr.(*ast.InfixExpression)
 

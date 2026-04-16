@@ -35,14 +35,14 @@ func (p *Parser) Errors() []string {
 // ParseProgram parses the input and returns an AST program
 func (p *Parser) ParseProgram() *ast.Program {
 	parseErrors = []string{} // Reset global errors
-	
+
 	yaccLexer := &YaccLexer{
 		impl:    p.lexer,
 		program: nil,
 	}
-	
+
 	yyParse(yaccLexer)
-	
+
 	// Deduplicate consecutive identical errors
 	uniqueErrors := []string{}
 	var lastError string
@@ -52,13 +52,13 @@ func (p *Parser) ParseProgram() *ast.Program {
 			lastError = err
 		}
 	}
-	
+
 	p.errors = uniqueErrors
-	
+
 	if yaccLexer.program != nil {
 		return yaccLexer.program
 	}
-	
+
 	return &ast.Program{Statements: []ast.Statement{}}
 }
 

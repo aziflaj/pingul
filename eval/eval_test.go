@@ -256,7 +256,7 @@ func TestInfixIntOperations(t *testing.T) {
 func TestIfElse(t *testing.T) {
 	testCases := []struct {
 		input    string
-		expected interface{}
+		expected any
 	}{
 		{"if (true) { 10 }", 10},
 		{"if (false) { 10 }", nil},
@@ -471,7 +471,7 @@ func TestObjectLiteral(t *testing.T) {
 func TestPropertyAccess(t *testing.T) {
 	testCases := []struct {
 		input    string
-		expected interface{}
+		expected any
 	}{
 		{`var obj = { key: "value" }; obj.key;`, "value"},
 		{`var obj = { num: 42 }; obj.num;`, int64(42)},
@@ -513,7 +513,7 @@ func TestEmptyObject(t *testing.T) {
 func TestObjectWithFunctions(t *testing.T) {
 	testCases := []struct {
 		input    string
-		expected interface{}
+		expected any
 	}{
 		// Simple function property
 		{`var squarer = { perform: func(x) { x * 2 } }; squarer.perform(5);`, int64(10)},
