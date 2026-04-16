@@ -27,6 +27,7 @@ type yySymType struct {
 	expression     ast.Expression
 	expressions    []ast.Expression
 	identifiers    []*ast.Identifier
+	objPairs       map[string]ast.Expression
 	token          token.Token
 	literal        []rune
 	intVal         int64
@@ -49,25 +50,27 @@ const LESS_THAN_OR_EQUAL = 57359
 const ASSIGNMENT = 57360
 const COMMA = 57361
 const SEMICOLON = 57362
-const LPAREN = 57363
-const RPAREN = 57364
-const LBRACKET = 57365
-const RBRACKET = 57366
-const LBRACE = 57367
-const RBRACE = 57368
-const VAR = 57369
-const FUNC = 57370
-const RETURN = 57371
-const IF = 57372
-const ELSE = 57373
-const NIL = 57374
-const TRUE = 57375
-const FALSE = 57376
-const AND = 57377
-const OR = 57378
-const NOT = 57379
-const UNARY_MINUS = 57380
-const UNARY_NOT = 57381
+const COLON = 57363
+const DOT = 57364
+const LPAREN = 57365
+const RPAREN = 57366
+const LBRACKET = 57367
+const RBRACKET = 57368
+const LBRACE = 57369
+const RBRACE = 57370
+const VAR = 57371
+const FUNC = 57372
+const RETURN = 57373
+const IF = 57374
+const ELSE = 57375
+const NIL = 57376
+const TRUE = 57377
+const FALSE = 57378
+const AND = 57379
+const OR = 57380
+const NOT = 57381
+const UNARY_MINUS = 57382
+const UNARY_NOT = 57383
 
 var yyToknames = [...]string{
 	"$end",
@@ -90,6 +93,8 @@ var yyToknames = [...]string{
 	"ASSIGNMENT",
 	"COMMA",
 	"SEMICOLON",
+	"COLON",
+	"DOT",
 	"LPAREN",
 	"RPAREN",
 	"LBRACKET",
@@ -117,7 +122,7 @@ const yyEofCode = 1
 const yyErrCode = 2
 const yyInitialStackSize = 16
 
-//line pingul.y:452
+//line pingul.y:499
 
 type YaccLexer struct {
 	impl    *lexer.LexerImpl
@@ -172,6 +177,10 @@ func (l *YaccLexer) Lex(lval *yySymType) int {
 		return COMMA
 	case token.SEMICOLON:
 		return SEMICOLON
+	case token.COLON:
+		return COLON
+	case token.DOT:
+		return DOT
 	case token.LPAREN:
 		return LPAREN
 	case token.RPAREN:
@@ -226,110 +235,116 @@ var yyExca = [...]int8{
 
 const yyPrivate = 57344
 
-const yyLast = 386
+const yyLast = 416
 
 var yyAct = [...]int8{
-	6, 3, 2, 83, 21, 87, 23, 84, 68, 48,
-	41, 42, 39, 67, 38, 47, 49, 86, 45, 46,
-	24, 80, 76, 72, 79, 75, 51, 52, 53, 54,
-	55, 56, 57, 58, 59, 60, 61, 62, 63, 64,
-	66, 27, 28, 29, 50, 22, 71, 65, 70, 43,
-	73, 8, 1, 39, 7, 38, 11, 12, 13, 0,
-	9, 0, 0, 0, 0, 0, 0, 0, 0, 77,
-	0, 0, 0, 18, 0, 17, 0, 82, 91, 4,
-	20, 5, 19, 85, 16, 14, 15, 88, 0, 10,
-	21, 90, 0, 7, 81, 11, 12, 13, 0, 9,
+	6, 3, 2, 96, 22, 101, 24, 76, 97, 54,
+	43, 44, 40, 41, 75, 39, 53, 51, 47, 25,
+	52, 74, 95, 78, 77, 55, 99, 57, 58, 59,
+	60, 61, 62, 63, 64, 65, 66, 67, 68, 69,
+	70, 49, 73, 92, 56, 86, 88, 82, 91, 71,
+	85, 23, 50, 48, 80, 81, 83, 26, 27, 28,
+	29, 30, 31, 32, 33, 34, 35, 36, 28, 29,
+	30, 72, 40, 41, 45, 39, 87, 8, 1, 89,
+	0, 40, 41, 0, 39, 0, 7, 94, 11, 12,
+	13, 0, 9, 0, 0, 98, 100, 0, 0, 0,
+	102, 0, 0, 93, 22, 104, 0, 19, 0, 17,
+	0, 18, 105, 4, 21, 5, 20, 0, 16, 14,
+	15, 0, 7, 10, 11, 12, 13, 0, 9, 0,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 18, 0, 17, 0, 0, 89, 4, 20,
-	5, 19, 0, 16, 14, 15, 0, 0, 10, 25,
+	0, 0, 0, 19, 0, 17, 0, 18, 103, 4,
+	21, 5, 20, 0, 16, 14, 15, 0, 0, 10,
 	26, 27, 28, 29, 30, 31, 32, 33, 34, 35,
-	0, 0, 40, 39, 0, 38, 25, 26, 27, 28,
-	29, 30, 31, 32, 33, 34, 35, 36, 37, 0,
-	39, 78, 38, 25, 26, 27, 28, 29, 30, 31,
-	32, 33, 34, 35, 36, 37, 0, 39, 0, 38,
-	74, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 36, 37, 25, 26, 27, 28, 29, 30, 31,
-	32, 33, 34, 35, 0, 0, 0, 39, 69, 38,
-	7, 0, 11, 12, 13, 0, 9, 0, 0, 0,
-	0, 36, 37, 0, 0, 0, 0, 0, 0, 18,
-	0, 17, 0, 0, 0, 4, 20, 5, 19, 0,
-	16, 14, 15, 0, 0, 10, 25, 26, 27, 28,
-	29, 30, 31, 32, 33, 34, 35, 0, 0, 0,
-	39, 0, 38, 11, 12, 13, 0, 9, 0, 0,
-	0, 0, 0, 0, 36, 37, 0, 0, 0, 0,
-	18, 0, 17, 44, 11, 12, 13, 20, 9, 19,
-	0, 16, 14, 15, 0, 0, 10, 0, 0, 0,
-	0, 18, 0, 17, 0, 0, 0, 0, 20, 0,
-	19, 0, 16, 14, 15, 0, 0, 10, 25, 26,
-	27, 28, 29, 30, 31, 32, 33, 34, 35, 0,
-	0, 0, 39, 0, 38, 25, 26, 27, 28, 29,
-	30, 31, 32, 33, 34, 35, 36, 0, 0, 39,
-	0, 38, 25, 26, 27, 28, 29, 0, 0, 32,
-	33, 34, 35, 0, 0, 0, 39, 0, 38, 25,
-	26, 27, 28, 29, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 39, 0, 38,
+	36, 0, 0, 42, 0, 40, 41, 0, 39, 26,
+	27, 28, 29, 30, 31, 32, 33, 34, 35, 36,
+	37, 38, 0, 0, 40, 41, 90, 39, 26, 27,
+	28, 29, 30, 31, 32, 33, 34, 35, 36, 37,
+	38, 0, 0, 40, 41, 0, 39, 84, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 37, 38,
+	26, 27, 28, 29, 30, 31, 32, 33, 34, 35,
+	36, 0, 0, 0, 0, 40, 41, 79, 39, 7,
+	0, 11, 12, 13, 0, 9, 0, 0, 0, 0,
+	37, 38, 0, 0, 0, 0, 0, 0, 0, 0,
+	19, 0, 17, 0, 18, 0, 4, 21, 5, 20,
+	0, 16, 14, 15, 0, 0, 10, 26, 27, 28,
+	29, 30, 31, 32, 33, 34, 35, 36, 0, 0,
+	0, 0, 40, 41, 0, 39, 11, 12, 13, 0,
+	9, 0, 0, 0, 0, 0, 0, 37, 38, 0,
+	0, 0, 0, 0, 0, 19, 0, 17, 46, 18,
+	0, 0, 21, 0, 20, 0, 16, 14, 15, 0,
+	0, 10, 11, 12, 13, 0, 9, 0, 0, 0,
+	0, 26, 27, 28, 29, 30, 0, 0, 0, 0,
+	0, 19, 0, 17, 0, 18, 40, 41, 21, 39,
+	20, 0, 16, 14, 15, 0, 0, 10, 26, 27,
+	28, 29, 30, 31, 32, 33, 34, 35, 36, 0,
+	0, 0, 0, 40, 41, 0, 39, 26, 27, 28,
+	29, 30, 0, 0, 33, 34, 35, 36, 37, 0,
+	0, 0, 40, 41, 0, 39,
 }
 
 var yyPact = [...]int16{
-	208, -1000, 208, -1000, 41, 280, 122, -1000, -1000, 280,
-	280, -1000, -1000, -1000, -1000, -1000, -1000, 259, 280, -6,
-	-12, -1000, -2, 122, -1000, 280, 280, 280, 280, 280,
-	280, 280, 280, 280, 280, 280, 280, 280, 280, 280,
-	-1000, -9, -9, -11, -1000, 239, 186, 280, 19, 280,
-	-1000, 32, 32, -9, -9, -9, 345, 345, 362, 362,
-	362, 362, 328, 311, 156, 3, 239, -1000, 280, -1000,
-	139, 2, -1000, 122, -1000, -1000, 280, 239, -18, -18,
-	13, -1000, 239, -26, 91, -1000, -1000, -18, 52, -1000,
-	-1000, -1000,
+	247, -1000, 247, -1000, 47, 338, 153, -1000, -1000, 338,
+	338, -1000, -1000, -1000, -1000, -1000, -1000, 302, 13, 338,
+	-7, -14, -1000, 7, 153, -1000, 338, 338, 338, 338,
+	338, 338, 338, 338, 338, 338, 338, 338, 338, 338,
+	45, 338, -1000, -10, -10, -5, -1000, 280, -21, -1000,
+	5, 2, 223, 338, 43, 338, -1000, 59, 59, -10,
+	-10, -10, 390, 390, 344, 344, 344, 344, 50, 371,
+	191, -1000, 26, 280, -1000, 338, -1000, 42, 338, -1000,
+	172, 24, -1000, 153, -1000, -1000, 338, 280, 1, 280,
+	-19, -19, 22, -1000, 280, 338, -28, 120, -1000, -1000,
+	280, -19, 84, -1000, -1000, -1000,
 }
 
 var yyPgo = [...]int8{
-	0, 52, 2, 1, 3, 0, 51, 49, 47, 46,
-	20,
+	0, 78, 2, 1, 3, 0, 77, 74, 71, 55,
+	53, 52, 19,
 }
 
 var yyR1 = [...]int8{
-	0, 1, 1, 2, 2, 3, 3, 3, 3, 10,
-	10, 4, 4, 5, 5, 5, 5, 5, 5, 5,
+	0, 1, 1, 2, 2, 3, 3, 3, 3, 12,
+	12, 4, 4, 5, 5, 5, 5, 5, 5, 5,
 	5, 5, 5, 5, 5, 5, 5, 5, 5, 5,
-	5, 6, 6, 6, 6, 6, 6, 6, 6, 6,
-	6, 6, 6, 7, 7, 8, 8, 8, 9, 9,
-	9,
+	5, 5, 6, 6, 6, 6, 6, 6, 6, 6,
+	6, 6, 6, 6, 6, 6, 7, 7, 8, 8,
+	8, 9, 9, 9, 10, 11, 11,
 }
 
 var yyR2 = [...]int8{
 	0, 1, 0, 1, 2, 5, 3, 2, 1, 1,
 	0, 3, 2, 1, 3, 3, 3, 3, 3, 3,
 	3, 3, 3, 3, 3, 3, 3, 2, 2, 4,
-	4, 1, 1, 1, 1, 1, 1, 3, 2, 3,
-	5, 7, 5, 1, 3, 1, 3, 0, 1, 3,
-	0,
+	3, 4, 1, 1, 1, 1, 1, 1, 3, 2,
+	3, 2, 3, 5, 7, 5, 1, 3, 1, 3,
+	0, 1, 3, 0, 1, 3, 5,
 }
 
 var yyChk = [...]int16{
-	-1000, -1, -2, -3, 27, 29, -5, 2, -6, 8,
-	37, 4, 5, 6, 33, 34, 32, 23, 21, 30,
-	28, -3, 4, -5, -10, 7, 8, 9, 10, 11,
-	12, 13, 14, 15, 16, 17, 35, 36, 23, 21,
-	20, -5, -5, -7, 24, -5, -5, 21, 21, 18,
-	-10, -5, -5, -5, -5, -5, -5, -5, -5, -5,
-	-5, -5, -5, -5, -5, -8, -5, 24, 19, 22,
-	-5, -9, 4, -5, 24, 22, 19, -5, 22, 22,
-	19, -10, -5, -4, 25, -4, 4, 31, -2, 26,
-	-4, 26,
+	-1000, -1, -2, -3, 29, 31, -5, 2, -6, 8,
+	39, 4, 5, 6, 35, 36, 34, 25, 27, 23,
+	32, 30, -3, 4, -5, -12, 7, 8, 9, 10,
+	11, 12, 13, 14, 15, 16, 17, 37, 38, 25,
+	22, 23, 20, -5, -5, -7, 26, -5, -10, 28,
+	-11, 4, -5, 23, 23, 18, -12, -5, -5, -5,
+	-5, -5, -5, -5, -5, -5, -5, -5, -5, -5,
+	-5, 4, -8, -5, 26, 19, 28, 19, 21, 24,
+	-5, -9, 4, -5, 26, 24, 19, -5, 4, -5,
+	24, 24, 19, -12, -5, 21, -4, 27, -4, 4,
+	-5, 33, -2, 28, -4, 28,
 }
 
 var yyDef = [...]int8{
 	-2, -2, -2, 3, 0, 0, 10, 8, 13, 0,
-	0, 31, 32, 33, 34, 35, 36, 0, 0, 0,
-	0, 4, 0, 10, 7, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 47,
-	9, 27, 28, 0, 38, 43, 0, 0, 50, 0,
-	6, 14, 15, 16, 17, 18, 19, 20, 21, 22,
-	23, 24, 25, 26, 0, 0, 45, 37, 0, 39,
-	0, 0, 48, 10, 29, 30, 0, 44, 0, 0,
-	0, 5, 46, 40, 0, 42, 49, 0, 0, 12,
-	41, 11,
+	0, 32, 33, 34, 35, 36, 37, 0, 0, 0,
+	0, 0, 4, 0, 10, 7, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 50, 9, 27, 28, 0, 39, 46, 0, 41,
+	54, 0, 0, 0, 53, 0, 6, 14, 15, 16,
+	17, 18, 19, 20, 21, 22, 23, 24, 25, 26,
+	0, 30, 0, 48, 38, 0, 40, 0, 0, 42,
+	0, 0, 51, 10, 29, 31, 0, 47, 0, 55,
+	0, 0, 0, 5, 49, 0, 43, 0, 45, 52,
+	56, 0, 0, 12, 44, 11,
 }
 
 var yyTok1 = [...]int8{
@@ -340,7 +355,7 @@ var yyTok2 = [...]int8{
 	2, 3, 4, 5, 6, 7, 8, 9, 10, 11,
 	12, 13, 14, 15, 16, 17, 18, 19, 20, 21,
 	22, 23, 24, 25, 26, 27, 28, 29, 30, 31,
-	32, 33, 34, 35, 36, 37, 38, 39,
+	32, 33, 34, 35, 36, 37, 38, 39, 40, 41,
 }
 
 var yyTok3 = [...]int8{
@@ -686,21 +701,21 @@ yydefault:
 
 	case 1:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line pingul.y:60
+//line pingul.y:65
 		{
 			yyVAL.program = &ast.Program{Statements: yyDollar[1].statements}
 			yylex.(*YaccLexer).program = yyVAL.program
 		}
 	case 2:
 		yyDollar = yyS[yypt-0 : yypt+1]
-//line pingul.y:65
+//line pingul.y:70
 		{
 			yyVAL.program = &ast.Program{Statements: []ast.Statement{}}
 			yylex.(*YaccLexer).program = yyVAL.program
 		}
 	case 3:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line pingul.y:73
+//line pingul.y:78
 		{
 			if yyDollar[1].statement != nil {
 				yyVAL.statements = []ast.Statement{yyDollar[1].statement}
@@ -710,7 +725,7 @@ yydefault:
 		}
 	case 4:
 		yyDollar = yyS[yypt-2 : yypt+1]
-//line pingul.y:81
+//line pingul.y:86
 		{
 			if yyDollar[2].statement != nil {
 				yyVAL.statements = append(yyDollar[1].statements, yyDollar[2].statement)
@@ -720,7 +735,7 @@ yydefault:
 		}
 	case 5:
 		yyDollar = yyS[yypt-5 : yypt+1]
-//line pingul.y:92
+//line pingul.y:97
 		{
 			yyVAL.statement = &ast.VarStatement{
 				Token: yyDollar[1].token,
@@ -733,7 +748,7 @@ yydefault:
 		}
 	case 6:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line pingul.y:103
+//line pingul.y:108
 		{
 			yyVAL.statement = &ast.ReturnStatement{
 				Token:       yyDollar[1].token,
@@ -742,7 +757,7 @@ yydefault:
 		}
 	case 7:
 		yyDollar = yyS[yypt-2 : yypt+1]
-//line pingul.y:110
+//line pingul.y:115
 		{
 			stmt := &ast.ExpressionStatement{Expression: yyDollar[1].expression}
 			if expr, ok := yyDollar[1].expression.(*ast.Identifier); ok {
@@ -770,14 +785,14 @@ yydefault:
 		}
 	case 8:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line pingul.y:136
+//line pingul.y:141
 		{
 			// Let yacc's default error handling record the error
 			yyVAL.statement = nil
 		}
 	case 11:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line pingul.y:149
+//line pingul.y:154
 		{
 			yyVAL.blockStatement = &ast.BlockStatement{
 				Token:      yyDollar[1].token,
@@ -786,7 +801,7 @@ yydefault:
 		}
 	case 12:
 		yyDollar = yyS[yypt-2 : yypt+1]
-//line pingul.y:156
+//line pingul.y:161
 		{
 			yyVAL.blockStatement = &ast.BlockStatement{
 				Token:      yyDollar[1].token,
@@ -795,7 +810,7 @@ yydefault:
 		}
 	case 14:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line pingul.y:167
+//line pingul.y:172
 		{
 			yyVAL.expression = &ast.InfixExpression{
 				Token:    yyDollar[2].token,
@@ -806,7 +821,7 @@ yydefault:
 		}
 	case 15:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line pingul.y:176
+//line pingul.y:181
 		{
 			yyVAL.expression = &ast.InfixExpression{
 				Token:    yyDollar[2].token,
@@ -817,7 +832,7 @@ yydefault:
 		}
 	case 16:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line pingul.y:185
+//line pingul.y:190
 		{
 			yyVAL.expression = &ast.InfixExpression{
 				Token:    yyDollar[2].token,
@@ -828,7 +843,7 @@ yydefault:
 		}
 	case 17:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line pingul.y:194
+//line pingul.y:199
 		{
 			yyVAL.expression = &ast.InfixExpression{
 				Token:    yyDollar[2].token,
@@ -839,7 +854,7 @@ yydefault:
 		}
 	case 18:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line pingul.y:203
+//line pingul.y:208
 		{
 			yyVAL.expression = &ast.InfixExpression{
 				Token:    yyDollar[2].token,
@@ -850,7 +865,7 @@ yydefault:
 		}
 	case 19:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line pingul.y:212
+//line pingul.y:217
 		{
 			yyVAL.expression = &ast.InfixExpression{
 				Token:    yyDollar[2].token,
@@ -861,7 +876,7 @@ yydefault:
 		}
 	case 20:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line pingul.y:221
+//line pingul.y:226
 		{
 			yyVAL.expression = &ast.InfixExpression{
 				Token:    yyDollar[2].token,
@@ -872,7 +887,7 @@ yydefault:
 		}
 	case 21:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line pingul.y:230
+//line pingul.y:235
 		{
 			yyVAL.expression = &ast.InfixExpression{
 				Token:    yyDollar[2].token,
@@ -883,7 +898,7 @@ yydefault:
 		}
 	case 22:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line pingul.y:239
+//line pingul.y:244
 		{
 			yyVAL.expression = &ast.InfixExpression{
 				Token:    yyDollar[2].token,
@@ -894,7 +909,7 @@ yydefault:
 		}
 	case 23:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line pingul.y:248
+//line pingul.y:253
 		{
 			yyVAL.expression = &ast.InfixExpression{
 				Token:    yyDollar[2].token,
@@ -905,7 +920,7 @@ yydefault:
 		}
 	case 24:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line pingul.y:257
+//line pingul.y:262
 		{
 			yyVAL.expression = &ast.InfixExpression{
 				Token:    yyDollar[2].token,
@@ -916,7 +931,7 @@ yydefault:
 		}
 	case 25:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line pingul.y:266
+//line pingul.y:271
 		{
 			yyVAL.expression = &ast.InfixExpression{
 				Token:    yyDollar[2].token,
@@ -927,7 +942,7 @@ yydefault:
 		}
 	case 26:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line pingul.y:275
+//line pingul.y:280
 		{
 			yyVAL.expression = &ast.InfixExpression{
 				Token:    yyDollar[2].token,
@@ -938,7 +953,7 @@ yydefault:
 		}
 	case 27:
 		yyDollar = yyS[yypt-2 : yypt+1]
-//line pingul.y:284
+//line pingul.y:289
 		{
 			yyVAL.expression = &ast.PrefixExpression{
 				Token:    yyDollar[1].token,
@@ -948,7 +963,7 @@ yydefault:
 		}
 	case 28:
 		yyDollar = yyS[yypt-2 : yypt+1]
-//line pingul.y:292
+//line pingul.y:297
 		{
 			yyVAL.expression = &ast.PrefixExpression{
 				Token:    yyDollar[1].token,
@@ -958,7 +973,7 @@ yydefault:
 		}
 	case 29:
 		yyDollar = yyS[yypt-4 : yypt+1]
-//line pingul.y:300
+//line pingul.y:305
 		{
 			yyVAL.expression = &ast.IndexExpression{
 				Token: yyDollar[2].token,
@@ -967,8 +982,18 @@ yydefault:
 			}
 		}
 	case 30:
+		yyDollar = yyS[yypt-3 : yypt+1]
+//line pingul.y:313
+		{
+			yyVAL.expression = &ast.PropertyAccess{
+				Token:    yyDollar[2].token,
+				Object:   yyDollar[1].expression,
+				Property: string(yyDollar[3].token.Literal),
+			}
+		}
+	case 31:
 		yyDollar = yyS[yypt-4 : yypt+1]
-//line pingul.y:308
+//line pingul.y:321
 		{
 			yyVAL.expression = &ast.CallExpression{
 				Token:     yyDollar[2].token,
@@ -976,18 +1001,18 @@ yydefault:
 				Arguments: yyDollar[3].expressions,
 			}
 		}
-	case 31:
+	case 32:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line pingul.y:319
+//line pingul.y:332
 		{
 			yyVAL.expression = &ast.Identifier{
 				Token: yyDollar[1].token,
 				Value: yyDollar[1].token.Literal,
 			}
 		}
-	case 32:
+	case 33:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line pingul.y:326
+//line pingul.y:339
 		{
 			val, _ := strconv.ParseInt(string(yyDollar[1].token.Literal), 0, 64)
 			yyVAL.expression = &ast.IntegerLiteral{
@@ -995,66 +1020,84 @@ yydefault:
 				Value: val,
 			}
 		}
-	case 33:
+	case 34:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line pingul.y:334
+//line pingul.y:347
 		{
 			yyVAL.expression = &ast.String{
 				Token: yyDollar[1].token,
 				Value: yyDollar[1].token.Literal,
 			}
 		}
-	case 34:
+	case 35:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line pingul.y:341
+//line pingul.y:354
 		{
 			yyVAL.expression = &ast.Boolean{
 				Token: yyDollar[1].token,
 				Value: true,
 			}
 		}
-	case 35:
+	case 36:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line pingul.y:348
+//line pingul.y:361
 		{
 			yyVAL.expression = &ast.Boolean{
 				Token: yyDollar[1].token,
 				Value: false,
 			}
 		}
-	case 36:
+	case 37:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line pingul.y:355
+//line pingul.y:368
 		{
 			yyVAL.expression = &ast.Nil{Token: yyDollar[1].token}
 		}
-	case 37:
+	case 38:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line pingul.y:359
+//line pingul.y:372
 		{
 			yyVAL.expression = &ast.List{
 				Token: yyDollar[1].token,
 				Items: yyDollar[2].expressions,
 			}
 		}
-	case 38:
+	case 39:
 		yyDollar = yyS[yypt-2 : yypt+1]
-//line pingul.y:366
+//line pingul.y:379
 		{
 			yyVAL.expression = &ast.List{
 				Token: yyDollar[1].token,
 				Items: []ast.Expression{},
 			}
 		}
-	case 39:
+	case 40:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line pingul.y:373
+//line pingul.y:386
+		{
+			yyVAL.expression = &ast.ObjectLiteral{
+				Token: yyDollar[1].token,
+				Pairs: yyDollar[2].objPairs,
+			}
+		}
+	case 41:
+		yyDollar = yyS[yypt-2 : yypt+1]
+//line pingul.y:393
+		{
+			yyVAL.expression = &ast.ObjectLiteral{
+				Token: yyDollar[1].token,
+				Pairs: make(map[string]ast.Expression),
+			}
+		}
+	case 42:
+		yyDollar = yyS[yypt-3 : yypt+1]
+//line pingul.y:400
 		{
 			yyVAL.expression = yyDollar[2].expression
 		}
-	case 40:
+	case 43:
 		yyDollar = yyS[yypt-5 : yypt+1]
-//line pingul.y:377
+//line pingul.y:404
 		{
 			yyVAL.expression = &ast.IfExpression{
 				Token:       yyDollar[1].token,
@@ -1062,9 +1105,9 @@ yydefault:
 				Consequence: yyDollar[5].blockStatement,
 			}
 		}
-	case 41:
+	case 44:
 		yyDollar = yyS[yypt-7 : yypt+1]
-//line pingul.y:385
+//line pingul.y:412
 		{
 			yyVAL.expression = &ast.IfExpression{
 				Token:       yyDollar[1].token,
@@ -1073,9 +1116,9 @@ yydefault:
 				Alternative: yyDollar[7].blockStatement,
 			}
 		}
-	case 42:
+	case 45:
 		yyDollar = yyS[yypt-5 : yypt+1]
-//line pingul.y:394
+//line pingul.y:421
 		{
 			yyVAL.expression = &ast.FuncExpression{
 				Token:  yyDollar[1].token,
@@ -1083,39 +1126,39 @@ yydefault:
 				Body:   yyDollar[5].blockStatement,
 			}
 		}
-	case 43:
-		yyDollar = yyS[yypt-1 : yypt+1]
-//line pingul.y:405
-		{
-			yyVAL.expressions = []ast.Expression{yyDollar[1].expression}
-		}
-	case 44:
-		yyDollar = yyS[yypt-3 : yypt+1]
-//line pingul.y:409
-		{
-			yyVAL.expressions = append(yyDollar[1].expressions, yyDollar[3].expression)
-		}
-	case 45:
-		yyDollar = yyS[yypt-1 : yypt+1]
-//line pingul.y:416
-		{
-			yyVAL.expressions = []ast.Expression{yyDollar[1].expression}
-		}
 	case 46:
-		yyDollar = yyS[yypt-3 : yypt+1]
-//line pingul.y:420
+		yyDollar = yyS[yypt-1 : yypt+1]
+//line pingul.y:432
 		{
-			yyVAL.expressions = append(yyDollar[1].expressions, yyDollar[3].expression)
+			yyVAL.expressions = []ast.Expression{yyDollar[1].expression}
 		}
 	case 47:
-		yyDollar = yyS[yypt-0 : yypt+1]
-//line pingul.y:424
+		yyDollar = yyS[yypt-3 : yypt+1]
+//line pingul.y:436
 		{
-			yyVAL.expressions = []ast.Expression{}
+			yyVAL.expressions = append(yyDollar[1].expressions, yyDollar[3].expression)
 		}
 	case 48:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line pingul.y:431
+//line pingul.y:443
+		{
+			yyVAL.expressions = []ast.Expression{yyDollar[1].expression}
+		}
+	case 49:
+		yyDollar = yyS[yypt-3 : yypt+1]
+//line pingul.y:447
+		{
+			yyVAL.expressions = append(yyDollar[1].expressions, yyDollar[3].expression)
+		}
+	case 50:
+		yyDollar = yyS[yypt-0 : yypt+1]
+//line pingul.y:451
+		{
+			yyVAL.expressions = []ast.Expression{}
+		}
+	case 51:
+		yyDollar = yyS[yypt-1 : yypt+1]
+//line pingul.y:458
 		{
 			yyVAL.identifiers = []*ast.Identifier{
 				{
@@ -1124,20 +1167,40 @@ yydefault:
 				},
 			}
 		}
-	case 49:
+	case 52:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line pingul.y:440
+//line pingul.y:467
 		{
 			yyVAL.identifiers = append(yyDollar[1].identifiers, &ast.Identifier{
 				Token: yyDollar[3].token,
 				Value: yyDollar[3].token.Literal,
 			})
 		}
-	case 50:
+	case 53:
 		yyDollar = yyS[yypt-0 : yypt+1]
-//line pingul.y:447
+//line pingul.y:474
 		{
 			yyVAL.identifiers = []*ast.Identifier{}
+		}
+	case 54:
+		yyDollar = yyS[yypt-1 : yypt+1]
+//line pingul.y:481
+		{
+			yyVAL.objPairs = yyDollar[1].objPairs
+		}
+	case 55:
+		yyDollar = yyS[yypt-3 : yypt+1]
+//line pingul.y:488
+		{
+			yyVAL.objPairs = make(map[string]ast.Expression)
+			yyVAL.objPairs[string(yyDollar[1].token.Literal)] = yyDollar[3].expression
+		}
+	case 56:
+		yyDollar = yyS[yypt-5 : yypt+1]
+//line pingul.y:493
+		{
+			yyDollar[1].objPairs[string(yyDollar[3].token.Literal)] = yyDollar[5].expression
+			yyVAL.objPairs = yyDollar[1].objPairs
 		}
 	}
 	goto yystack /* stack new state and value */

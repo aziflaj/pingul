@@ -3,18 +3,19 @@ state 0
 	$accept: .program $end 
 	program: .    (2)
 
-	$end  reduce 2 (src line 64)
+	$end  reduce 2 (src line 69)
 	error  shift 7
 	IDENTIFIER  shift 11
 	INT  shift 12
 	STRING  shift 13
 	MINUS  shift 9
-	LPAREN  shift 18
+	LPAREN  shift 19
 	LBRACKET  shift 17
+	LBRACE  shift 18
 	VAR  shift 4
-	FUNC  shift 20
+	FUNC  shift 21
 	RETURN  shift 5
-	IF  shift 19
+	IF  shift 20
 	NIL  shift 16
 	TRUE  shift 14
 	FALSE  shift 15
@@ -38,38 +39,39 @@ state 2
 	program:  statements.    (1)
 	statements:  statements.statement 
 
-	$end  reduce 1 (src line 58)
+	$end  reduce 1 (src line 63)
 	error  shift 7
 	IDENTIFIER  shift 11
 	INT  shift 12
 	STRING  shift 13
 	MINUS  shift 9
-	LPAREN  shift 18
+	LPAREN  shift 19
 	LBRACKET  shift 17
+	LBRACE  shift 18
 	VAR  shift 4
-	FUNC  shift 20
+	FUNC  shift 21
 	RETURN  shift 5
-	IF  shift 19
+	IF  shift 20
 	NIL  shift 16
 	TRUE  shift 14
 	FALSE  shift 15
 	NOT  shift 10
 	.  error
 
-	statement  goto 21
+	statement  goto 22
 	expression  goto 6
 	primary  goto 8
 
 state 3
 	statements:  statement.    (3)
 
-	.  reduce 3 (src line 71)
+	.  reduce 3 (src line 76)
 
 
 state 4
 	statement:  VAR.IDENTIFIER ASSIGNMENT expression optSemicolon 
 
-	IDENTIFIER  shift 22
+	IDENTIFIER  shift 23
 	.  error
 
 
@@ -80,22 +82,23 @@ state 5
 	INT  shift 12
 	STRING  shift 13
 	MINUS  shift 9
-	LPAREN  shift 18
+	LPAREN  shift 19
 	LBRACKET  shift 17
-	FUNC  shift 20
-	IF  shift 19
+	LBRACE  shift 18
+	FUNC  shift 21
+	IF  shift 20
 	NIL  shift 16
 	TRUE  shift 14
 	FALSE  shift 15
 	NOT  shift 10
 	.  error
 
-	expression  goto 23
+	expression  goto 24
 	primary  goto 8
 
-6: shift/reduce conflict (shift 26(5), red'n 10(0)) on MINUS
-6: shift/reduce conflict (shift 39(0), red'n 10(0)) on LPAREN
-6: shift/reduce conflict (shift 38(0), red'n 10(0)) on LBRACKET
+6: shift/reduce conflict (shift 27(5), red'n 10(0)) on MINUS
+6: shift/reduce conflict (shift 41(9), red'n 10(0)) on LPAREN
+6: shift/reduce conflict (shift 39(9), red'n 10(0)) on LBRACKET
 state 6
 	statement:  expression.optSemicolon 
 	expression:  expression.PLUS expression 
@@ -112,39 +115,41 @@ state 6
 	expression:  expression.AND expression 
 	expression:  expression.OR expression 
 	expression:  expression.LBRACKET expression RBRACKET 
+	expression:  expression.DOT IDENTIFIER 
 	expression:  expression.LPAREN arguments RPAREN 
 	optSemicolon: .    (10)
 
-	PLUS  shift 25
-	MINUS  shift 26
-	MULTIPLY  shift 27
-	DIVIDE  shift 28
-	MODULUS  shift 29
-	EQUAL  shift 30
-	NOT_EQUAL  shift 31
-	GREATER_THAN  shift 32
-	LESS_THAN  shift 33
-	GREATER_THAN_OR_EQUAL  shift 34
-	LESS_THAN_OR_EQUAL  shift 35
-	SEMICOLON  shift 40
-	LPAREN  shift 39
-	LBRACKET  shift 38
-	AND  shift 36
-	OR  shift 37
-	.  reduce 10 (src line 144)
+	PLUS  shift 26
+	MINUS  shift 27
+	MULTIPLY  shift 28
+	DIVIDE  shift 29
+	MODULUS  shift 30
+	EQUAL  shift 31
+	NOT_EQUAL  shift 32
+	GREATER_THAN  shift 33
+	LESS_THAN  shift 34
+	GREATER_THAN_OR_EQUAL  shift 35
+	LESS_THAN_OR_EQUAL  shift 36
+	SEMICOLON  shift 42
+	DOT  shift 40
+	LPAREN  shift 41
+	LBRACKET  shift 39
+	AND  shift 37
+	OR  shift 38
+	.  reduce 10 (src line 149)
 
-	optSemicolon  goto 24
+	optSemicolon  goto 25
 
 state 7
 	statement:  error.    (8)
 
-	.  reduce 8 (src line 135)
+	.  reduce 8 (src line 140)
 
 
 state 8
 	expression:  primary.    (13)
 
-	.  reduce 13 (src line 164)
+	.  reduce 13 (src line 169)
 
 
 state 9
@@ -154,17 +159,18 @@ state 9
 	INT  shift 12
 	STRING  shift 13
 	MINUS  shift 9
-	LPAREN  shift 18
+	LPAREN  shift 19
 	LBRACKET  shift 17
-	FUNC  shift 20
-	IF  shift 19
+	LBRACE  shift 18
+	FUNC  shift 21
+	IF  shift 20
 	NIL  shift 16
 	TRUE  shift 14
 	FALSE  shift 15
 	NOT  shift 10
 	.  error
 
-	expression  goto 41
+	expression  goto 43
 	primary  goto 8
 
 state 10
@@ -174,53 +180,54 @@ state 10
 	INT  shift 12
 	STRING  shift 13
 	MINUS  shift 9
-	LPAREN  shift 18
+	LPAREN  shift 19
 	LBRACKET  shift 17
-	FUNC  shift 20
-	IF  shift 19
+	LBRACE  shift 18
+	FUNC  shift 21
+	IF  shift 20
 	NIL  shift 16
 	TRUE  shift 14
 	FALSE  shift 15
 	NOT  shift 10
 	.  error
 
-	expression  goto 42
+	expression  goto 44
 	primary  goto 8
 
 state 11
-	primary:  IDENTIFIER.    (31)
+	primary:  IDENTIFIER.    (32)
 
-	.  reduce 31 (src line 317)
+	.  reduce 32 (src line 330)
 
 
 state 12
-	primary:  INT.    (32)
+	primary:  INT.    (33)
 
-	.  reduce 32 (src line 325)
+	.  reduce 33 (src line 338)
 
 
 state 13
-	primary:  STRING.    (33)
+	primary:  STRING.    (34)
 
-	.  reduce 33 (src line 333)
+	.  reduce 34 (src line 346)
 
 
 state 14
-	primary:  TRUE.    (34)
+	primary:  TRUE.    (35)
 
-	.  reduce 34 (src line 340)
+	.  reduce 35 (src line 353)
 
 
 state 15
-	primary:  FALSE.    (35)
+	primary:  FALSE.    (36)
 
-	.  reduce 35 (src line 347)
+	.  reduce 36 (src line 360)
 
 
 state 16
-	primary:  NIL.    (36)
+	primary:  NIL.    (37)
 
-	.  reduce 36 (src line 354)
+	.  reduce 37 (src line 367)
 
 
 state 17
@@ -231,73 +238,86 @@ state 17
 	INT  shift 12
 	STRING  shift 13
 	MINUS  shift 9
-	LPAREN  shift 18
+	LPAREN  shift 19
 	LBRACKET  shift 17
-	RBRACKET  shift 44
-	FUNC  shift 20
-	IF  shift 19
+	RBRACKET  shift 46
+	LBRACE  shift 18
+	FUNC  shift 21
+	IF  shift 20
 	NIL  shift 16
 	TRUE  shift 14
 	FALSE  shift 15
 	NOT  shift 10
 	.  error
 
-	expression  goto 45
+	expression  goto 47
 	primary  goto 8
-	expressionList  goto 43
+	expressionList  goto 45
 
 state 18
+	primary:  LBRACE.objectPairs RBRACE 
+	primary:  LBRACE.RBRACE 
+
+	IDENTIFIER  shift 51
+	RBRACE  shift 49
+	.  error
+
+	objectPairs  goto 48
+	objectPairsList  goto 50
+
+state 19
 	primary:  LPAREN.expression RPAREN 
 
 	IDENTIFIER  shift 11
 	INT  shift 12
 	STRING  shift 13
 	MINUS  shift 9
-	LPAREN  shift 18
+	LPAREN  shift 19
 	LBRACKET  shift 17
-	FUNC  shift 20
-	IF  shift 19
+	LBRACE  shift 18
+	FUNC  shift 21
+	IF  shift 20
 	NIL  shift 16
 	TRUE  shift 14
 	FALSE  shift 15
 	NOT  shift 10
 	.  error
 
-	expression  goto 46
+	expression  goto 52
 	primary  goto 8
 
-state 19
+state 20
 	primary:  IF.LPAREN expression RPAREN block 
 	primary:  IF.LPAREN expression RPAREN block ELSE block 
 
-	LPAREN  shift 47
-	.  error
-
-
-state 20
-	primary:  FUNC.LPAREN parameters RPAREN block 
-
-	LPAREN  shift 48
+	LPAREN  shift 53
 	.  error
 
 
 state 21
-	statements:  statements statement.    (4)
+	primary:  FUNC.LPAREN parameters RPAREN block 
 
-	.  reduce 4 (src line 80)
-
-
-state 22
-	statement:  VAR IDENTIFIER.ASSIGNMENT expression optSemicolon 
-
-	ASSIGNMENT  shift 49
+	LPAREN  shift 54
 	.  error
 
 
-23: shift/reduce conflict (shift 26(5), red'n 10(0)) on MINUS
-23: shift/reduce conflict (shift 39(0), red'n 10(0)) on LPAREN
-23: shift/reduce conflict (shift 38(0), red'n 10(0)) on LBRACKET
+state 22
+	statements:  statements statement.    (4)
+
+	.  reduce 4 (src line 85)
+
+
 state 23
+	statement:  VAR IDENTIFIER.ASSIGNMENT expression optSemicolon 
+
+	ASSIGNMENT  shift 55
+	.  error
+
+
+24: shift/reduce conflict (shift 27(5), red'n 10(0)) on MINUS
+24: shift/reduce conflict (shift 41(9), red'n 10(0)) on LPAREN
+24: shift/reduce conflict (shift 39(9), red'n 10(0)) on LBRACKET
+state 24
 	statement:  RETURN expression.optSemicolon 
 	expression:  expression.PLUS expression 
 	expression:  expression.MINUS expression 
@@ -313,166 +333,49 @@ state 23
 	expression:  expression.AND expression 
 	expression:  expression.OR expression 
 	expression:  expression.LBRACKET expression RBRACKET 
+	expression:  expression.DOT IDENTIFIER 
 	expression:  expression.LPAREN arguments RPAREN 
 	optSemicolon: .    (10)
 
-	PLUS  shift 25
-	MINUS  shift 26
-	MULTIPLY  shift 27
-	DIVIDE  shift 28
-	MODULUS  shift 29
-	EQUAL  shift 30
-	NOT_EQUAL  shift 31
-	GREATER_THAN  shift 32
-	LESS_THAN  shift 33
-	GREATER_THAN_OR_EQUAL  shift 34
-	LESS_THAN_OR_EQUAL  shift 35
-	SEMICOLON  shift 40
-	LPAREN  shift 39
-	LBRACKET  shift 38
-	AND  shift 36
-	OR  shift 37
-	.  reduce 10 (src line 144)
+	PLUS  shift 26
+	MINUS  shift 27
+	MULTIPLY  shift 28
+	DIVIDE  shift 29
+	MODULUS  shift 30
+	EQUAL  shift 31
+	NOT_EQUAL  shift 32
+	GREATER_THAN  shift 33
+	LESS_THAN  shift 34
+	GREATER_THAN_OR_EQUAL  shift 35
+	LESS_THAN_OR_EQUAL  shift 36
+	SEMICOLON  shift 42
+	DOT  shift 40
+	LPAREN  shift 41
+	LBRACKET  shift 39
+	AND  shift 37
+	OR  shift 38
+	.  reduce 10 (src line 149)
 
-	optSemicolon  goto 50
-
-state 24
-	statement:  expression optSemicolon.    (7)
-
-	.  reduce 7 (src line 109)
-
+	optSemicolon  goto 56
 
 state 25
+	statement:  expression optSemicolon.    (7)
+
+	.  reduce 7 (src line 114)
+
+
+state 26
 	expression:  expression PLUS.expression 
 
 	IDENTIFIER  shift 11
 	INT  shift 12
 	STRING  shift 13
 	MINUS  shift 9
-	LPAREN  shift 18
+	LPAREN  shift 19
 	LBRACKET  shift 17
-	FUNC  shift 20
-	IF  shift 19
-	NIL  shift 16
-	TRUE  shift 14
-	FALSE  shift 15
-	NOT  shift 10
-	.  error
-
-	expression  goto 51
-	primary  goto 8
-
-state 26
-	expression:  expression MINUS.expression 
-
-	IDENTIFIER  shift 11
-	INT  shift 12
-	STRING  shift 13
-	MINUS  shift 9
-	LPAREN  shift 18
-	LBRACKET  shift 17
-	FUNC  shift 20
-	IF  shift 19
-	NIL  shift 16
-	TRUE  shift 14
-	FALSE  shift 15
-	NOT  shift 10
-	.  error
-
-	expression  goto 52
-	primary  goto 8
-
-state 27
-	expression:  expression MULTIPLY.expression 
-
-	IDENTIFIER  shift 11
-	INT  shift 12
-	STRING  shift 13
-	MINUS  shift 9
-	LPAREN  shift 18
-	LBRACKET  shift 17
-	FUNC  shift 20
-	IF  shift 19
-	NIL  shift 16
-	TRUE  shift 14
-	FALSE  shift 15
-	NOT  shift 10
-	.  error
-
-	expression  goto 53
-	primary  goto 8
-
-state 28
-	expression:  expression DIVIDE.expression 
-
-	IDENTIFIER  shift 11
-	INT  shift 12
-	STRING  shift 13
-	MINUS  shift 9
-	LPAREN  shift 18
-	LBRACKET  shift 17
-	FUNC  shift 20
-	IF  shift 19
-	NIL  shift 16
-	TRUE  shift 14
-	FALSE  shift 15
-	NOT  shift 10
-	.  error
-
-	expression  goto 54
-	primary  goto 8
-
-state 29
-	expression:  expression MODULUS.expression 
-
-	IDENTIFIER  shift 11
-	INT  shift 12
-	STRING  shift 13
-	MINUS  shift 9
-	LPAREN  shift 18
-	LBRACKET  shift 17
-	FUNC  shift 20
-	IF  shift 19
-	NIL  shift 16
-	TRUE  shift 14
-	FALSE  shift 15
-	NOT  shift 10
-	.  error
-
-	expression  goto 55
-	primary  goto 8
-
-state 30
-	expression:  expression EQUAL.expression 
-
-	IDENTIFIER  shift 11
-	INT  shift 12
-	STRING  shift 13
-	MINUS  shift 9
-	LPAREN  shift 18
-	LBRACKET  shift 17
-	FUNC  shift 20
-	IF  shift 19
-	NIL  shift 16
-	TRUE  shift 14
-	FALSE  shift 15
-	NOT  shift 10
-	.  error
-
-	expression  goto 56
-	primary  goto 8
-
-state 31
-	expression:  expression NOT_EQUAL.expression 
-
-	IDENTIFIER  shift 11
-	INT  shift 12
-	STRING  shift 13
-	MINUS  shift 9
-	LPAREN  shift 18
-	LBRACKET  shift 17
-	FUNC  shift 20
-	IF  shift 19
+	LBRACE  shift 18
+	FUNC  shift 21
+	IF  shift 20
 	NIL  shift 16
 	TRUE  shift 14
 	FALSE  shift 15
@@ -482,17 +385,18 @@ state 31
 	expression  goto 57
 	primary  goto 8
 
-state 32
-	expression:  expression GREATER_THAN.expression 
+state 27
+	expression:  expression MINUS.expression 
 
 	IDENTIFIER  shift 11
 	INT  shift 12
 	STRING  shift 13
 	MINUS  shift 9
-	LPAREN  shift 18
+	LPAREN  shift 19
 	LBRACKET  shift 17
-	FUNC  shift 20
-	IF  shift 19
+	LBRACE  shift 18
+	FUNC  shift 21
+	IF  shift 20
 	NIL  shift 16
 	TRUE  shift 14
 	FALSE  shift 15
@@ -502,17 +406,18 @@ state 32
 	expression  goto 58
 	primary  goto 8
 
-state 33
-	expression:  expression LESS_THAN.expression 
+state 28
+	expression:  expression MULTIPLY.expression 
 
 	IDENTIFIER  shift 11
 	INT  shift 12
 	STRING  shift 13
 	MINUS  shift 9
-	LPAREN  shift 18
+	LPAREN  shift 19
 	LBRACKET  shift 17
-	FUNC  shift 20
-	IF  shift 19
+	LBRACE  shift 18
+	FUNC  shift 21
+	IF  shift 20
 	NIL  shift 16
 	TRUE  shift 14
 	FALSE  shift 15
@@ -522,17 +427,18 @@ state 33
 	expression  goto 59
 	primary  goto 8
 
-state 34
-	expression:  expression GREATER_THAN_OR_EQUAL.expression 
+state 29
+	expression:  expression DIVIDE.expression 
 
 	IDENTIFIER  shift 11
 	INT  shift 12
 	STRING  shift 13
 	MINUS  shift 9
-	LPAREN  shift 18
+	LPAREN  shift 19
 	LBRACKET  shift 17
-	FUNC  shift 20
-	IF  shift 19
+	LBRACE  shift 18
+	FUNC  shift 21
+	IF  shift 20
 	NIL  shift 16
 	TRUE  shift 14
 	FALSE  shift 15
@@ -542,17 +448,18 @@ state 34
 	expression  goto 60
 	primary  goto 8
 
-state 35
-	expression:  expression LESS_THAN_OR_EQUAL.expression 
+state 30
+	expression:  expression MODULUS.expression 
 
 	IDENTIFIER  shift 11
 	INT  shift 12
 	STRING  shift 13
 	MINUS  shift 9
-	LPAREN  shift 18
+	LPAREN  shift 19
 	LBRACKET  shift 17
-	FUNC  shift 20
-	IF  shift 19
+	LBRACE  shift 18
+	FUNC  shift 21
+	IF  shift 20
 	NIL  shift 16
 	TRUE  shift 14
 	FALSE  shift 15
@@ -562,17 +469,18 @@ state 35
 	expression  goto 61
 	primary  goto 8
 
-state 36
-	expression:  expression AND.expression 
+state 31
+	expression:  expression EQUAL.expression 
 
 	IDENTIFIER  shift 11
 	INT  shift 12
 	STRING  shift 13
 	MINUS  shift 9
-	LPAREN  shift 18
+	LPAREN  shift 19
 	LBRACKET  shift 17
-	FUNC  shift 20
-	IF  shift 19
+	LBRACE  shift 18
+	FUNC  shift 21
+	IF  shift 20
 	NIL  shift 16
 	TRUE  shift 14
 	FALSE  shift 15
@@ -582,17 +490,18 @@ state 36
 	expression  goto 62
 	primary  goto 8
 
-state 37
-	expression:  expression OR.expression 
+state 32
+	expression:  expression NOT_EQUAL.expression 
 
 	IDENTIFIER  shift 11
 	INT  shift 12
 	STRING  shift 13
 	MINUS  shift 9
-	LPAREN  shift 18
+	LPAREN  shift 19
 	LBRACKET  shift 17
-	FUNC  shift 20
-	IF  shift 19
+	LBRACE  shift 18
+	FUNC  shift 21
+	IF  shift 20
 	NIL  shift 16
 	TRUE  shift 14
 	FALSE  shift 15
@@ -602,17 +511,18 @@ state 37
 	expression  goto 63
 	primary  goto 8
 
-state 38
-	expression:  expression LBRACKET.expression RBRACKET 
+state 33
+	expression:  expression GREATER_THAN.expression 
 
 	IDENTIFIER  shift 11
 	INT  shift 12
 	STRING  shift 13
 	MINUS  shift 9
-	LPAREN  shift 18
+	LPAREN  shift 19
 	LBRACKET  shift 17
-	FUNC  shift 20
-	IF  shift 19
+	LBRACE  shift 18
+	FUNC  shift 21
+	IF  shift 20
 	NIL  shift 16
 	TRUE  shift 14
 	FALSE  shift 15
@@ -622,37 +532,169 @@ state 38
 	expression  goto 64
 	primary  goto 8
 
-state 39
-	expression:  expression LPAREN.arguments RPAREN 
-	arguments: .    (47)
+state 34
+	expression:  expression LESS_THAN.expression 
 
 	IDENTIFIER  shift 11
 	INT  shift 12
 	STRING  shift 13
 	MINUS  shift 9
-	LPAREN  shift 18
+	LPAREN  shift 19
 	LBRACKET  shift 17
-	FUNC  shift 20
-	IF  shift 19
+	LBRACE  shift 18
+	FUNC  shift 21
+	IF  shift 20
 	NIL  shift 16
 	TRUE  shift 14
 	FALSE  shift 15
 	NOT  shift 10
-	.  reduce 47 (src line 423)
+	.  error
+
+	expression  goto 65
+	primary  goto 8
+
+state 35
+	expression:  expression GREATER_THAN_OR_EQUAL.expression 
+
+	IDENTIFIER  shift 11
+	INT  shift 12
+	STRING  shift 13
+	MINUS  shift 9
+	LPAREN  shift 19
+	LBRACKET  shift 17
+	LBRACE  shift 18
+	FUNC  shift 21
+	IF  shift 20
+	NIL  shift 16
+	TRUE  shift 14
+	FALSE  shift 15
+	NOT  shift 10
+	.  error
 
 	expression  goto 66
 	primary  goto 8
-	arguments  goto 65
+
+state 36
+	expression:  expression LESS_THAN_OR_EQUAL.expression 
+
+	IDENTIFIER  shift 11
+	INT  shift 12
+	STRING  shift 13
+	MINUS  shift 9
+	LPAREN  shift 19
+	LBRACKET  shift 17
+	LBRACE  shift 18
+	FUNC  shift 21
+	IF  shift 20
+	NIL  shift 16
+	TRUE  shift 14
+	FALSE  shift 15
+	NOT  shift 10
+	.  error
+
+	expression  goto 67
+	primary  goto 8
+
+state 37
+	expression:  expression AND.expression 
+
+	IDENTIFIER  shift 11
+	INT  shift 12
+	STRING  shift 13
+	MINUS  shift 9
+	LPAREN  shift 19
+	LBRACKET  shift 17
+	LBRACE  shift 18
+	FUNC  shift 21
+	IF  shift 20
+	NIL  shift 16
+	TRUE  shift 14
+	FALSE  shift 15
+	NOT  shift 10
+	.  error
+
+	expression  goto 68
+	primary  goto 8
+
+state 38
+	expression:  expression OR.expression 
+
+	IDENTIFIER  shift 11
+	INT  shift 12
+	STRING  shift 13
+	MINUS  shift 9
+	LPAREN  shift 19
+	LBRACKET  shift 17
+	LBRACE  shift 18
+	FUNC  shift 21
+	IF  shift 20
+	NIL  shift 16
+	TRUE  shift 14
+	FALSE  shift 15
+	NOT  shift 10
+	.  error
+
+	expression  goto 69
+	primary  goto 8
+
+state 39
+	expression:  expression LBRACKET.expression RBRACKET 
+
+	IDENTIFIER  shift 11
+	INT  shift 12
+	STRING  shift 13
+	MINUS  shift 9
+	LPAREN  shift 19
+	LBRACKET  shift 17
+	LBRACE  shift 18
+	FUNC  shift 21
+	IF  shift 20
+	NIL  shift 16
+	TRUE  shift 14
+	FALSE  shift 15
+	NOT  shift 10
+	.  error
+
+	expression  goto 70
+	primary  goto 8
 
 state 40
+	expression:  expression DOT.IDENTIFIER 
+
+	IDENTIFIER  shift 71
+	.  error
+
+
+state 41
+	expression:  expression LPAREN.arguments RPAREN 
+	arguments: .    (50)
+
+	IDENTIFIER  shift 11
+	INT  shift 12
+	STRING  shift 13
+	MINUS  shift 9
+	LPAREN  shift 19
+	LBRACKET  shift 17
+	LBRACE  shift 18
+	FUNC  shift 21
+	IF  shift 20
+	NIL  shift 16
+	TRUE  shift 14
+	FALSE  shift 15
+	NOT  shift 10
+	.  reduce 50 (src line 450)
+
+	expression  goto 73
+	primary  goto 8
+	arguments  goto 72
+
+state 42
 	optSemicolon:  SEMICOLON.    (9)
 
-	.  reduce 9 (src line 142)
+	.  reduce 9 (src line 147)
 
 
-41: shift/reduce conflict (shift 39(0), red'n 27(7)) on LPAREN
-41: shift/reduce conflict (shift 38(0), red'n 27(7)) on LBRACKET
-state 41
+state 43
 	expression:  expression.PLUS expression 
 	expression:  expression.MINUS expression 
 	expression:  expression.MULTIPLY expression 
@@ -668,16 +710,16 @@ state 41
 	expression:  expression.OR expression 
 	expression:  MINUS expression.    (27)
 	expression:  expression.LBRACKET expression RBRACKET 
+	expression:  expression.DOT IDENTIFIER 
 	expression:  expression.LPAREN arguments RPAREN 
 
-	LPAREN  shift 39
-	LBRACKET  shift 38
-	.  reduce 27 (src line 283)
+	DOT  shift 40
+	LPAREN  shift 41
+	LBRACKET  shift 39
+	.  reduce 27 (src line 288)
 
 
-42: shift/reduce conflict (shift 39(0), red'n 28(7)) on LPAREN
-42: shift/reduce conflict (shift 38(0), red'n 28(7)) on LBRACKET
-state 42
+state 44
 	expression:  expression.PLUS expression 
 	expression:  expression.MINUS expression 
 	expression:  expression.MULTIPLY expression 
@@ -693,102 +735,136 @@ state 42
 	expression:  expression.OR expression 
 	expression:  NOT expression.    (28)
 	expression:  expression.LBRACKET expression RBRACKET 
+	expression:  expression.DOT IDENTIFIER 
 	expression:  expression.LPAREN arguments RPAREN 
 
-	LPAREN  shift 39
-	LBRACKET  shift 38
-	.  reduce 28 (src line 291)
-
-
-state 43
-	primary:  LBRACKET expressionList.RBRACKET 
-	expressionList:  expressionList.COMMA expression 
-
-	COMMA  shift 68
-	RBRACKET  shift 67
-	.  error
-
-
-state 44
-	primary:  LBRACKET RBRACKET.    (38)
-
-	.  reduce 38 (src line 365)
+	DOT  shift 40
+	LPAREN  shift 41
+	LBRACKET  shift 39
+	.  reduce 28 (src line 296)
 
 
 state 45
-	expression:  expression.PLUS expression 
-	expression:  expression.MINUS expression 
-	expression:  expression.MULTIPLY expression 
-	expression:  expression.DIVIDE expression 
-	expression:  expression.MODULUS expression 
-	expression:  expression.EQUAL expression 
-	expression:  expression.NOT_EQUAL expression 
-	expression:  expression.GREATER_THAN expression 
-	expression:  expression.LESS_THAN expression 
-	expression:  expression.GREATER_THAN_OR_EQUAL expression 
-	expression:  expression.LESS_THAN_OR_EQUAL expression 
-	expression:  expression.AND expression 
-	expression:  expression.OR expression 
-	expression:  expression.LBRACKET expression RBRACKET 
-	expression:  expression.LPAREN arguments RPAREN 
-	expressionList:  expression.    (43)
+	primary:  LBRACKET expressionList.RBRACKET 
+	expressionList:  expressionList.COMMA expression 
 
-	PLUS  shift 25
-	MINUS  shift 26
-	MULTIPLY  shift 27
-	DIVIDE  shift 28
-	MODULUS  shift 29
-	EQUAL  shift 30
-	NOT_EQUAL  shift 31
-	GREATER_THAN  shift 32
-	LESS_THAN  shift 33
-	GREATER_THAN_OR_EQUAL  shift 34
-	LESS_THAN_OR_EQUAL  shift 35
-	LPAREN  shift 39
-	LBRACKET  shift 38
-	AND  shift 36
-	OR  shift 37
-	.  reduce 43 (src line 403)
-
-
-state 46
-	expression:  expression.PLUS expression 
-	expression:  expression.MINUS expression 
-	expression:  expression.MULTIPLY expression 
-	expression:  expression.DIVIDE expression 
-	expression:  expression.MODULUS expression 
-	expression:  expression.EQUAL expression 
-	expression:  expression.NOT_EQUAL expression 
-	expression:  expression.GREATER_THAN expression 
-	expression:  expression.LESS_THAN expression 
-	expression:  expression.GREATER_THAN_OR_EQUAL expression 
-	expression:  expression.LESS_THAN_OR_EQUAL expression 
-	expression:  expression.AND expression 
-	expression:  expression.OR expression 
-	expression:  expression.LBRACKET expression RBRACKET 
-	expression:  expression.LPAREN arguments RPAREN 
-	primary:  LPAREN expression.RPAREN 
-
-	PLUS  shift 25
-	MINUS  shift 26
-	MULTIPLY  shift 27
-	DIVIDE  shift 28
-	MODULUS  shift 29
-	EQUAL  shift 30
-	NOT_EQUAL  shift 31
-	GREATER_THAN  shift 32
-	LESS_THAN  shift 33
-	GREATER_THAN_OR_EQUAL  shift 34
-	LESS_THAN_OR_EQUAL  shift 35
-	LPAREN  shift 39
-	RPAREN  shift 69
-	LBRACKET  shift 38
-	AND  shift 36
-	OR  shift 37
+	COMMA  shift 75
+	RBRACKET  shift 74
 	.  error
 
 
+state 46
+	primary:  LBRACKET RBRACKET.    (39)
+
+	.  reduce 39 (src line 378)
+
+
 state 47
+	expression:  expression.PLUS expression 
+	expression:  expression.MINUS expression 
+	expression:  expression.MULTIPLY expression 
+	expression:  expression.DIVIDE expression 
+	expression:  expression.MODULUS expression 
+	expression:  expression.EQUAL expression 
+	expression:  expression.NOT_EQUAL expression 
+	expression:  expression.GREATER_THAN expression 
+	expression:  expression.LESS_THAN expression 
+	expression:  expression.GREATER_THAN_OR_EQUAL expression 
+	expression:  expression.LESS_THAN_OR_EQUAL expression 
+	expression:  expression.AND expression 
+	expression:  expression.OR expression 
+	expression:  expression.LBRACKET expression RBRACKET 
+	expression:  expression.DOT IDENTIFIER 
+	expression:  expression.LPAREN arguments RPAREN 
+	expressionList:  expression.    (46)
+
+	PLUS  shift 26
+	MINUS  shift 27
+	MULTIPLY  shift 28
+	DIVIDE  shift 29
+	MODULUS  shift 30
+	EQUAL  shift 31
+	NOT_EQUAL  shift 32
+	GREATER_THAN  shift 33
+	LESS_THAN  shift 34
+	GREATER_THAN_OR_EQUAL  shift 35
+	LESS_THAN_OR_EQUAL  shift 36
+	DOT  shift 40
+	LPAREN  shift 41
+	LBRACKET  shift 39
+	AND  shift 37
+	OR  shift 38
+	.  reduce 46 (src line 430)
+
+
+state 48
+	primary:  LBRACE objectPairs.RBRACE 
+
+	RBRACE  shift 76
+	.  error
+
+
+state 49
+	primary:  LBRACE RBRACE.    (41)
+
+	.  reduce 41 (src line 392)
+
+
+state 50
+	objectPairs:  objectPairsList.    (54)
+	objectPairsList:  objectPairsList.COMMA IDENTIFIER COLON expression 
+
+	COMMA  shift 77
+	.  reduce 54 (src line 479)
+
+
+state 51
+	objectPairsList:  IDENTIFIER.COLON expression 
+
+	COLON  shift 78
+	.  error
+
+
+state 52
+	expression:  expression.PLUS expression 
+	expression:  expression.MINUS expression 
+	expression:  expression.MULTIPLY expression 
+	expression:  expression.DIVIDE expression 
+	expression:  expression.MODULUS expression 
+	expression:  expression.EQUAL expression 
+	expression:  expression.NOT_EQUAL expression 
+	expression:  expression.GREATER_THAN expression 
+	expression:  expression.LESS_THAN expression 
+	expression:  expression.GREATER_THAN_OR_EQUAL expression 
+	expression:  expression.LESS_THAN_OR_EQUAL expression 
+	expression:  expression.AND expression 
+	expression:  expression.OR expression 
+	expression:  expression.LBRACKET expression RBRACKET 
+	expression:  expression.DOT IDENTIFIER 
+	expression:  expression.LPAREN arguments RPAREN 
+	primary:  LPAREN expression.RPAREN 
+
+	PLUS  shift 26
+	MINUS  shift 27
+	MULTIPLY  shift 28
+	DIVIDE  shift 29
+	MODULUS  shift 30
+	EQUAL  shift 31
+	NOT_EQUAL  shift 32
+	GREATER_THAN  shift 33
+	LESS_THAN  shift 34
+	GREATER_THAN_OR_EQUAL  shift 35
+	LESS_THAN_OR_EQUAL  shift 36
+	DOT  shift 40
+	LPAREN  shift 41
+	RPAREN  shift 79
+	LBRACKET  shift 39
+	AND  shift 37
+	OR  shift 38
+	.  error
+
+
+state 53
 	primary:  IF LPAREN.expression RPAREN block 
 	primary:  IF LPAREN.expression RPAREN block ELSE block 
 
@@ -796,57 +872,57 @@ state 47
 	INT  shift 12
 	STRING  shift 13
 	MINUS  shift 9
-	LPAREN  shift 18
+	LPAREN  shift 19
 	LBRACKET  shift 17
-	FUNC  shift 20
-	IF  shift 19
+	LBRACE  shift 18
+	FUNC  shift 21
+	IF  shift 20
 	NIL  shift 16
 	TRUE  shift 14
 	FALSE  shift 15
 	NOT  shift 10
 	.  error
 
-	expression  goto 70
+	expression  goto 80
 	primary  goto 8
 
-state 48
+state 54
 	primary:  FUNC LPAREN.parameters RPAREN block 
-	parameters: .    (50)
+	parameters: .    (53)
 
-	IDENTIFIER  shift 72
-	.  reduce 50 (src line 446)
+	IDENTIFIER  shift 82
+	.  reduce 53 (src line 473)
 
-	parameters  goto 71
+	parameters  goto 81
 
-state 49
+state 55
 	statement:  VAR IDENTIFIER ASSIGNMENT.expression optSemicolon 
 
 	IDENTIFIER  shift 11
 	INT  shift 12
 	STRING  shift 13
 	MINUS  shift 9
-	LPAREN  shift 18
+	LPAREN  shift 19
 	LBRACKET  shift 17
-	FUNC  shift 20
-	IF  shift 19
+	LBRACE  shift 18
+	FUNC  shift 21
+	IF  shift 20
 	NIL  shift 16
 	TRUE  shift 14
 	FALSE  shift 15
 	NOT  shift 10
 	.  error
 
-	expression  goto 73
+	expression  goto 83
 	primary  goto 8
 
-state 50
+state 56
 	statement:  RETURN expression optSemicolon.    (6)
 
-	.  reduce 6 (src line 102)
+	.  reduce 6 (src line 107)
 
 
-51: shift/reduce conflict (shift 39(0), red'n 14(5)) on LPAREN
-51: shift/reduce conflict (shift 38(0), red'n 14(5)) on LBRACKET
-state 51
+state 57
 	expression:  expression.PLUS expression 
 	expression:  expression PLUS expression.    (14)
 	expression:  expression.MINUS expression 
@@ -862,19 +938,19 @@ state 51
 	expression:  expression.AND expression 
 	expression:  expression.OR expression 
 	expression:  expression.LBRACKET expression RBRACKET 
+	expression:  expression.DOT IDENTIFIER 
 	expression:  expression.LPAREN arguments RPAREN 
 
-	MULTIPLY  shift 27
-	DIVIDE  shift 28
-	MODULUS  shift 29
-	LPAREN  shift 39
-	LBRACKET  shift 38
-	.  reduce 14 (src line 166)
+	MULTIPLY  shift 28
+	DIVIDE  shift 29
+	MODULUS  shift 30
+	DOT  shift 40
+	LPAREN  shift 41
+	LBRACKET  shift 39
+	.  reduce 14 (src line 171)
 
 
-52: shift/reduce conflict (shift 39(0), red'n 15(5)) on LPAREN
-52: shift/reduce conflict (shift 38(0), red'n 15(5)) on LBRACKET
-state 52
+state 58
 	expression:  expression.PLUS expression 
 	expression:  expression.MINUS expression 
 	expression:  expression MINUS expression.    (15)
@@ -890,19 +966,19 @@ state 52
 	expression:  expression.AND expression 
 	expression:  expression.OR expression 
 	expression:  expression.LBRACKET expression RBRACKET 
+	expression:  expression.DOT IDENTIFIER 
 	expression:  expression.LPAREN arguments RPAREN 
 
-	MULTIPLY  shift 27
-	DIVIDE  shift 28
-	MODULUS  shift 29
-	LPAREN  shift 39
-	LBRACKET  shift 38
-	.  reduce 15 (src line 175)
+	MULTIPLY  shift 28
+	DIVIDE  shift 29
+	MODULUS  shift 30
+	DOT  shift 40
+	LPAREN  shift 41
+	LBRACKET  shift 39
+	.  reduce 15 (src line 180)
 
 
-53: shift/reduce conflict (shift 39(0), red'n 16(6)) on LPAREN
-53: shift/reduce conflict (shift 38(0), red'n 16(6)) on LBRACKET
-state 53
+state 59
 	expression:  expression.PLUS expression 
 	expression:  expression.MINUS expression 
 	expression:  expression.MULTIPLY expression 
@@ -918,16 +994,16 @@ state 53
 	expression:  expression.AND expression 
 	expression:  expression.OR expression 
 	expression:  expression.LBRACKET expression RBRACKET 
+	expression:  expression.DOT IDENTIFIER 
 	expression:  expression.LPAREN arguments RPAREN 
 
-	LPAREN  shift 39
-	LBRACKET  shift 38
-	.  reduce 16 (src line 184)
+	DOT  shift 40
+	LPAREN  shift 41
+	LBRACKET  shift 39
+	.  reduce 16 (src line 189)
 
 
-54: shift/reduce conflict (shift 39(0), red'n 17(6)) on LPAREN
-54: shift/reduce conflict (shift 38(0), red'n 17(6)) on LBRACKET
-state 54
+state 60
 	expression:  expression.PLUS expression 
 	expression:  expression.MINUS expression 
 	expression:  expression.MULTIPLY expression 
@@ -943,16 +1019,16 @@ state 54
 	expression:  expression.AND expression 
 	expression:  expression.OR expression 
 	expression:  expression.LBRACKET expression RBRACKET 
+	expression:  expression.DOT IDENTIFIER 
 	expression:  expression.LPAREN arguments RPAREN 
 
-	LPAREN  shift 39
-	LBRACKET  shift 38
-	.  reduce 17 (src line 193)
+	DOT  shift 40
+	LPAREN  shift 41
+	LBRACKET  shift 39
+	.  reduce 17 (src line 198)
 
 
-55: shift/reduce conflict (shift 39(0), red'n 18(6)) on LPAREN
-55: shift/reduce conflict (shift 38(0), red'n 18(6)) on LBRACKET
-state 55
+state 61
 	expression:  expression.PLUS expression 
 	expression:  expression.MINUS expression 
 	expression:  expression.MULTIPLY expression 
@@ -968,16 +1044,16 @@ state 55
 	expression:  expression.AND expression 
 	expression:  expression.OR expression 
 	expression:  expression.LBRACKET expression RBRACKET 
+	expression:  expression.DOT IDENTIFIER 
 	expression:  expression.LPAREN arguments RPAREN 
 
-	LPAREN  shift 39
-	LBRACKET  shift 38
-	.  reduce 18 (src line 202)
+	DOT  shift 40
+	LPAREN  shift 41
+	LBRACKET  shift 39
+	.  reduce 18 (src line 207)
 
 
-56: shift/reduce conflict (shift 39(0), red'n 19(3)) on LPAREN
-56: shift/reduce conflict (shift 38(0), red'n 19(3)) on LBRACKET
-state 56
+state 62
 	expression:  expression.PLUS expression 
 	expression:  expression.MINUS expression 
 	expression:  expression.MULTIPLY expression 
@@ -993,25 +1069,25 @@ state 56
 	expression:  expression.AND expression 
 	expression:  expression.OR expression 
 	expression:  expression.LBRACKET expression RBRACKET 
+	expression:  expression.DOT IDENTIFIER 
 	expression:  expression.LPAREN arguments RPAREN 
 
-	PLUS  shift 25
-	MINUS  shift 26
-	MULTIPLY  shift 27
-	DIVIDE  shift 28
-	MODULUS  shift 29
-	GREATER_THAN  shift 32
-	LESS_THAN  shift 33
-	GREATER_THAN_OR_EQUAL  shift 34
-	LESS_THAN_OR_EQUAL  shift 35
-	LPAREN  shift 39
-	LBRACKET  shift 38
-	.  reduce 19 (src line 211)
+	PLUS  shift 26
+	MINUS  shift 27
+	MULTIPLY  shift 28
+	DIVIDE  shift 29
+	MODULUS  shift 30
+	GREATER_THAN  shift 33
+	LESS_THAN  shift 34
+	GREATER_THAN_OR_EQUAL  shift 35
+	LESS_THAN_OR_EQUAL  shift 36
+	DOT  shift 40
+	LPAREN  shift 41
+	LBRACKET  shift 39
+	.  reduce 19 (src line 216)
 
 
-57: shift/reduce conflict (shift 39(0), red'n 20(3)) on LPAREN
-57: shift/reduce conflict (shift 38(0), red'n 20(3)) on LBRACKET
-state 57
+state 63
 	expression:  expression.PLUS expression 
 	expression:  expression.MINUS expression 
 	expression:  expression.MULTIPLY expression 
@@ -1027,25 +1103,25 @@ state 57
 	expression:  expression.AND expression 
 	expression:  expression.OR expression 
 	expression:  expression.LBRACKET expression RBRACKET 
+	expression:  expression.DOT IDENTIFIER 
 	expression:  expression.LPAREN arguments RPAREN 
 
-	PLUS  shift 25
-	MINUS  shift 26
-	MULTIPLY  shift 27
-	DIVIDE  shift 28
-	MODULUS  shift 29
-	GREATER_THAN  shift 32
-	LESS_THAN  shift 33
-	GREATER_THAN_OR_EQUAL  shift 34
-	LESS_THAN_OR_EQUAL  shift 35
-	LPAREN  shift 39
-	LBRACKET  shift 38
-	.  reduce 20 (src line 220)
+	PLUS  shift 26
+	MINUS  shift 27
+	MULTIPLY  shift 28
+	DIVIDE  shift 29
+	MODULUS  shift 30
+	GREATER_THAN  shift 33
+	LESS_THAN  shift 34
+	GREATER_THAN_OR_EQUAL  shift 35
+	LESS_THAN_OR_EQUAL  shift 36
+	DOT  shift 40
+	LPAREN  shift 41
+	LBRACKET  shift 39
+	.  reduce 20 (src line 225)
 
 
-58: shift/reduce conflict (shift 39(0), red'n 21(4)) on LPAREN
-58: shift/reduce conflict (shift 38(0), red'n 21(4)) on LBRACKET
-state 58
+state 64
 	expression:  expression.PLUS expression 
 	expression:  expression.MINUS expression 
 	expression:  expression.MULTIPLY expression 
@@ -1061,21 +1137,21 @@ state 58
 	expression:  expression.AND expression 
 	expression:  expression.OR expression 
 	expression:  expression.LBRACKET expression RBRACKET 
+	expression:  expression.DOT IDENTIFIER 
 	expression:  expression.LPAREN arguments RPAREN 
 
-	PLUS  shift 25
-	MINUS  shift 26
-	MULTIPLY  shift 27
-	DIVIDE  shift 28
-	MODULUS  shift 29
-	LPAREN  shift 39
-	LBRACKET  shift 38
-	.  reduce 21 (src line 229)
+	PLUS  shift 26
+	MINUS  shift 27
+	MULTIPLY  shift 28
+	DIVIDE  shift 29
+	MODULUS  shift 30
+	DOT  shift 40
+	LPAREN  shift 41
+	LBRACKET  shift 39
+	.  reduce 21 (src line 234)
 
 
-59: shift/reduce conflict (shift 39(0), red'n 22(4)) on LPAREN
-59: shift/reduce conflict (shift 38(0), red'n 22(4)) on LBRACKET
-state 59
+state 65
 	expression:  expression.PLUS expression 
 	expression:  expression.MINUS expression 
 	expression:  expression.MULTIPLY expression 
@@ -1091,21 +1167,21 @@ state 59
 	expression:  expression.AND expression 
 	expression:  expression.OR expression 
 	expression:  expression.LBRACKET expression RBRACKET 
+	expression:  expression.DOT IDENTIFIER 
 	expression:  expression.LPAREN arguments RPAREN 
 
-	PLUS  shift 25
-	MINUS  shift 26
-	MULTIPLY  shift 27
-	DIVIDE  shift 28
-	MODULUS  shift 29
-	LPAREN  shift 39
-	LBRACKET  shift 38
-	.  reduce 22 (src line 238)
+	PLUS  shift 26
+	MINUS  shift 27
+	MULTIPLY  shift 28
+	DIVIDE  shift 29
+	MODULUS  shift 30
+	DOT  shift 40
+	LPAREN  shift 41
+	LBRACKET  shift 39
+	.  reduce 22 (src line 243)
 
 
-60: shift/reduce conflict (shift 39(0), red'n 23(4)) on LPAREN
-60: shift/reduce conflict (shift 38(0), red'n 23(4)) on LBRACKET
-state 60
+state 66
 	expression:  expression.PLUS expression 
 	expression:  expression.MINUS expression 
 	expression:  expression.MULTIPLY expression 
@@ -1121,21 +1197,21 @@ state 60
 	expression:  expression.AND expression 
 	expression:  expression.OR expression 
 	expression:  expression.LBRACKET expression RBRACKET 
+	expression:  expression.DOT IDENTIFIER 
 	expression:  expression.LPAREN arguments RPAREN 
 
-	PLUS  shift 25
-	MINUS  shift 26
-	MULTIPLY  shift 27
-	DIVIDE  shift 28
-	MODULUS  shift 29
-	LPAREN  shift 39
-	LBRACKET  shift 38
-	.  reduce 23 (src line 247)
+	PLUS  shift 26
+	MINUS  shift 27
+	MULTIPLY  shift 28
+	DIVIDE  shift 29
+	MODULUS  shift 30
+	DOT  shift 40
+	LPAREN  shift 41
+	LBRACKET  shift 39
+	.  reduce 23 (src line 252)
 
 
-61: shift/reduce conflict (shift 39(0), red'n 24(4)) on LPAREN
-61: shift/reduce conflict (shift 38(0), red'n 24(4)) on LBRACKET
-state 61
+state 67
 	expression:  expression.PLUS expression 
 	expression:  expression.MINUS expression 
 	expression:  expression.MULTIPLY expression 
@@ -1151,21 +1227,21 @@ state 61
 	expression:  expression.AND expression 
 	expression:  expression.OR expression 
 	expression:  expression.LBRACKET expression RBRACKET 
+	expression:  expression.DOT IDENTIFIER 
 	expression:  expression.LPAREN arguments RPAREN 
 
-	PLUS  shift 25
-	MINUS  shift 26
-	MULTIPLY  shift 27
-	DIVIDE  shift 28
-	MODULUS  shift 29
-	LPAREN  shift 39
-	LBRACKET  shift 38
-	.  reduce 24 (src line 256)
+	PLUS  shift 26
+	MINUS  shift 27
+	MULTIPLY  shift 28
+	DIVIDE  shift 29
+	MODULUS  shift 30
+	DOT  shift 40
+	LPAREN  shift 41
+	LBRACKET  shift 39
+	.  reduce 24 (src line 261)
 
 
-62: shift/reduce conflict (shift 39(0), red'n 25(2)) on LPAREN
-62: shift/reduce conflict (shift 38(0), red'n 25(2)) on LBRACKET
-state 62
+state 68
 	expression:  expression.PLUS expression 
 	expression:  expression.MINUS expression 
 	expression:  expression.MULTIPLY expression 
@@ -1181,27 +1257,27 @@ state 62
 	expression:  expression AND expression.    (25)
 	expression:  expression.OR expression 
 	expression:  expression.LBRACKET expression RBRACKET 
+	expression:  expression.DOT IDENTIFIER 
 	expression:  expression.LPAREN arguments RPAREN 
 
-	PLUS  shift 25
-	MINUS  shift 26
-	MULTIPLY  shift 27
-	DIVIDE  shift 28
-	MODULUS  shift 29
-	EQUAL  shift 30
-	NOT_EQUAL  shift 31
-	GREATER_THAN  shift 32
-	LESS_THAN  shift 33
-	GREATER_THAN_OR_EQUAL  shift 34
-	LESS_THAN_OR_EQUAL  shift 35
-	LPAREN  shift 39
-	LBRACKET  shift 38
-	.  reduce 25 (src line 265)
+	PLUS  shift 26
+	MINUS  shift 27
+	MULTIPLY  shift 28
+	DIVIDE  shift 29
+	MODULUS  shift 30
+	EQUAL  shift 31
+	NOT_EQUAL  shift 32
+	GREATER_THAN  shift 33
+	LESS_THAN  shift 34
+	GREATER_THAN_OR_EQUAL  shift 35
+	LESS_THAN_OR_EQUAL  shift 36
+	DOT  shift 40
+	LPAREN  shift 41
+	LBRACKET  shift 39
+	.  reduce 25 (src line 270)
 
 
-63: shift/reduce conflict (shift 39(0), red'n 26(1)) on LPAREN
-63: shift/reduce conflict (shift 38(0), red'n 26(1)) on LBRACKET
-state 63
+state 69
 	expression:  expression.PLUS expression 
 	expression:  expression.MINUS expression 
 	expression:  expression.MULTIPLY expression 
@@ -1217,137 +1293,25 @@ state 63
 	expression:  expression.OR expression 
 	expression:  expression OR expression.    (26)
 	expression:  expression.LBRACKET expression RBRACKET 
+	expression:  expression.DOT IDENTIFIER 
 	expression:  expression.LPAREN arguments RPAREN 
 
-	PLUS  shift 25
-	MINUS  shift 26
-	MULTIPLY  shift 27
-	DIVIDE  shift 28
-	MODULUS  shift 29
-	EQUAL  shift 30
-	NOT_EQUAL  shift 31
-	GREATER_THAN  shift 32
-	LESS_THAN  shift 33
-	GREATER_THAN_OR_EQUAL  shift 34
-	LESS_THAN_OR_EQUAL  shift 35
-	LPAREN  shift 39
-	LBRACKET  shift 38
-	AND  shift 36
-	.  reduce 26 (src line 274)
-
-
-state 64
-	expression:  expression.PLUS expression 
-	expression:  expression.MINUS expression 
-	expression:  expression.MULTIPLY expression 
-	expression:  expression.DIVIDE expression 
-	expression:  expression.MODULUS expression 
-	expression:  expression.EQUAL expression 
-	expression:  expression.NOT_EQUAL expression 
-	expression:  expression.GREATER_THAN expression 
-	expression:  expression.LESS_THAN expression 
-	expression:  expression.GREATER_THAN_OR_EQUAL expression 
-	expression:  expression.LESS_THAN_OR_EQUAL expression 
-	expression:  expression.AND expression 
-	expression:  expression.OR expression 
-	expression:  expression.LBRACKET expression RBRACKET 
-	expression:  expression LBRACKET expression.RBRACKET 
-	expression:  expression.LPAREN arguments RPAREN 
-
-	PLUS  shift 25
-	MINUS  shift 26
-	MULTIPLY  shift 27
-	DIVIDE  shift 28
-	MODULUS  shift 29
-	EQUAL  shift 30
-	NOT_EQUAL  shift 31
-	GREATER_THAN  shift 32
-	LESS_THAN  shift 33
-	GREATER_THAN_OR_EQUAL  shift 34
-	LESS_THAN_OR_EQUAL  shift 35
-	LPAREN  shift 39
-	LBRACKET  shift 38
-	RBRACKET  shift 74
-	AND  shift 36
-	OR  shift 37
-	.  error
-
-
-state 65
-	expression:  expression LPAREN arguments.RPAREN 
-	arguments:  arguments.COMMA expression 
-
-	COMMA  shift 76
-	RPAREN  shift 75
-	.  error
-
-
-state 66
-	expression:  expression.PLUS expression 
-	expression:  expression.MINUS expression 
-	expression:  expression.MULTIPLY expression 
-	expression:  expression.DIVIDE expression 
-	expression:  expression.MODULUS expression 
-	expression:  expression.EQUAL expression 
-	expression:  expression.NOT_EQUAL expression 
-	expression:  expression.GREATER_THAN expression 
-	expression:  expression.LESS_THAN expression 
-	expression:  expression.GREATER_THAN_OR_EQUAL expression 
-	expression:  expression.LESS_THAN_OR_EQUAL expression 
-	expression:  expression.AND expression 
-	expression:  expression.OR expression 
-	expression:  expression.LBRACKET expression RBRACKET 
-	expression:  expression.LPAREN arguments RPAREN 
-	arguments:  expression.    (45)
-
-	PLUS  shift 25
-	MINUS  shift 26
-	MULTIPLY  shift 27
-	DIVIDE  shift 28
-	MODULUS  shift 29
-	EQUAL  shift 30
-	NOT_EQUAL  shift 31
-	GREATER_THAN  shift 32
-	LESS_THAN  shift 33
-	GREATER_THAN_OR_EQUAL  shift 34
-	LESS_THAN_OR_EQUAL  shift 35
-	LPAREN  shift 39
-	LBRACKET  shift 38
-	AND  shift 36
-	OR  shift 37
-	.  reduce 45 (src line 414)
-
-
-state 67
-	primary:  LBRACKET expressionList RBRACKET.    (37)
-
-	.  reduce 37 (src line 358)
-
-
-state 68
-	expressionList:  expressionList COMMA.expression 
-
-	IDENTIFIER  shift 11
-	INT  shift 12
-	STRING  shift 13
-	MINUS  shift 9
-	LPAREN  shift 18
-	LBRACKET  shift 17
-	FUNC  shift 20
-	IF  shift 19
-	NIL  shift 16
-	TRUE  shift 14
-	FALSE  shift 15
-	NOT  shift 10
-	.  error
-
-	expression  goto 77
-	primary  goto 8
-
-state 69
-	primary:  LPAREN expression RPAREN.    (39)
-
-	.  reduce 39 (src line 372)
+	PLUS  shift 26
+	MINUS  shift 27
+	MULTIPLY  shift 28
+	DIVIDE  shift 29
+	MODULUS  shift 30
+	EQUAL  shift 31
+	NOT_EQUAL  shift 32
+	GREATER_THAN  shift 33
+	LESS_THAN  shift 34
+	GREATER_THAN_OR_EQUAL  shift 35
+	LESS_THAN_OR_EQUAL  shift 36
+	DOT  shift 40
+	LPAREN  shift 41
+	LBRACKET  shift 39
+	AND  shift 37
+	.  reduce 26 (src line 279)
 
 
 state 70
@@ -1365,48 +1329,209 @@ state 70
 	expression:  expression.AND expression 
 	expression:  expression.OR expression 
 	expression:  expression.LBRACKET expression RBRACKET 
+	expression:  expression LBRACKET expression.RBRACKET 
+	expression:  expression.DOT IDENTIFIER 
 	expression:  expression.LPAREN arguments RPAREN 
-	primary:  IF LPAREN expression.RPAREN block 
-	primary:  IF LPAREN expression.RPAREN block ELSE block 
 
-	PLUS  shift 25
-	MINUS  shift 26
-	MULTIPLY  shift 27
-	DIVIDE  shift 28
-	MODULUS  shift 29
-	EQUAL  shift 30
-	NOT_EQUAL  shift 31
-	GREATER_THAN  shift 32
-	LESS_THAN  shift 33
-	GREATER_THAN_OR_EQUAL  shift 34
-	LESS_THAN_OR_EQUAL  shift 35
-	LPAREN  shift 39
-	RPAREN  shift 78
-	LBRACKET  shift 38
-	AND  shift 36
-	OR  shift 37
+	PLUS  shift 26
+	MINUS  shift 27
+	MULTIPLY  shift 28
+	DIVIDE  shift 29
+	MODULUS  shift 30
+	EQUAL  shift 31
+	NOT_EQUAL  shift 32
+	GREATER_THAN  shift 33
+	LESS_THAN  shift 34
+	GREATER_THAN_OR_EQUAL  shift 35
+	LESS_THAN_OR_EQUAL  shift 36
+	DOT  shift 40
+	LPAREN  shift 41
+	LBRACKET  shift 39
+	RBRACKET  shift 84
+	AND  shift 37
+	OR  shift 38
 	.  error
 
 
 state 71
-	primary:  FUNC LPAREN parameters.RPAREN block 
-	parameters:  parameters.COMMA IDENTIFIER 
+	expression:  expression DOT IDENTIFIER.    (30)
 
-	COMMA  shift 80
-	RPAREN  shift 79
-	.  error
+	.  reduce 30 (src line 312)
 
 
 state 72
-	parameters:  IDENTIFIER.    (48)
+	expression:  expression LPAREN arguments.RPAREN 
+	arguments:  arguments.COMMA expression 
 
-	.  reduce 48 (src line 429)
+	COMMA  shift 86
+	RPAREN  shift 85
+	.  error
 
 
-73: shift/reduce conflict (shift 26(5), red'n 10(0)) on MINUS
-73: shift/reduce conflict (shift 39(0), red'n 10(0)) on LPAREN
-73: shift/reduce conflict (shift 38(0), red'n 10(0)) on LBRACKET
 state 73
+	expression:  expression.PLUS expression 
+	expression:  expression.MINUS expression 
+	expression:  expression.MULTIPLY expression 
+	expression:  expression.DIVIDE expression 
+	expression:  expression.MODULUS expression 
+	expression:  expression.EQUAL expression 
+	expression:  expression.NOT_EQUAL expression 
+	expression:  expression.GREATER_THAN expression 
+	expression:  expression.LESS_THAN expression 
+	expression:  expression.GREATER_THAN_OR_EQUAL expression 
+	expression:  expression.LESS_THAN_OR_EQUAL expression 
+	expression:  expression.AND expression 
+	expression:  expression.OR expression 
+	expression:  expression.LBRACKET expression RBRACKET 
+	expression:  expression.DOT IDENTIFIER 
+	expression:  expression.LPAREN arguments RPAREN 
+	arguments:  expression.    (48)
+
+	PLUS  shift 26
+	MINUS  shift 27
+	MULTIPLY  shift 28
+	DIVIDE  shift 29
+	MODULUS  shift 30
+	EQUAL  shift 31
+	NOT_EQUAL  shift 32
+	GREATER_THAN  shift 33
+	LESS_THAN  shift 34
+	GREATER_THAN_OR_EQUAL  shift 35
+	LESS_THAN_OR_EQUAL  shift 36
+	DOT  shift 40
+	LPAREN  shift 41
+	LBRACKET  shift 39
+	AND  shift 37
+	OR  shift 38
+	.  reduce 48 (src line 441)
+
+
+state 74
+	primary:  LBRACKET expressionList RBRACKET.    (38)
+
+	.  reduce 38 (src line 371)
+
+
+state 75
+	expressionList:  expressionList COMMA.expression 
+
+	IDENTIFIER  shift 11
+	INT  shift 12
+	STRING  shift 13
+	MINUS  shift 9
+	LPAREN  shift 19
+	LBRACKET  shift 17
+	LBRACE  shift 18
+	FUNC  shift 21
+	IF  shift 20
+	NIL  shift 16
+	TRUE  shift 14
+	FALSE  shift 15
+	NOT  shift 10
+	.  error
+
+	expression  goto 87
+	primary  goto 8
+
+state 76
+	primary:  LBRACE objectPairs RBRACE.    (40)
+
+	.  reduce 40 (src line 385)
+
+
+state 77
+	objectPairsList:  objectPairsList COMMA.IDENTIFIER COLON expression 
+
+	IDENTIFIER  shift 88
+	.  error
+
+
+state 78
+	objectPairsList:  IDENTIFIER COLON.expression 
+
+	IDENTIFIER  shift 11
+	INT  shift 12
+	STRING  shift 13
+	MINUS  shift 9
+	LPAREN  shift 19
+	LBRACKET  shift 17
+	LBRACE  shift 18
+	FUNC  shift 21
+	IF  shift 20
+	NIL  shift 16
+	TRUE  shift 14
+	FALSE  shift 15
+	NOT  shift 10
+	.  error
+
+	expression  goto 89
+	primary  goto 8
+
+state 79
+	primary:  LPAREN expression RPAREN.    (42)
+
+	.  reduce 42 (src line 399)
+
+
+state 80
+	expression:  expression.PLUS expression 
+	expression:  expression.MINUS expression 
+	expression:  expression.MULTIPLY expression 
+	expression:  expression.DIVIDE expression 
+	expression:  expression.MODULUS expression 
+	expression:  expression.EQUAL expression 
+	expression:  expression.NOT_EQUAL expression 
+	expression:  expression.GREATER_THAN expression 
+	expression:  expression.LESS_THAN expression 
+	expression:  expression.GREATER_THAN_OR_EQUAL expression 
+	expression:  expression.LESS_THAN_OR_EQUAL expression 
+	expression:  expression.AND expression 
+	expression:  expression.OR expression 
+	expression:  expression.LBRACKET expression RBRACKET 
+	expression:  expression.DOT IDENTIFIER 
+	expression:  expression.LPAREN arguments RPAREN 
+	primary:  IF LPAREN expression.RPAREN block 
+	primary:  IF LPAREN expression.RPAREN block ELSE block 
+
+	PLUS  shift 26
+	MINUS  shift 27
+	MULTIPLY  shift 28
+	DIVIDE  shift 29
+	MODULUS  shift 30
+	EQUAL  shift 31
+	NOT_EQUAL  shift 32
+	GREATER_THAN  shift 33
+	LESS_THAN  shift 34
+	GREATER_THAN_OR_EQUAL  shift 35
+	LESS_THAN_OR_EQUAL  shift 36
+	DOT  shift 40
+	LPAREN  shift 41
+	RPAREN  shift 90
+	LBRACKET  shift 39
+	AND  shift 37
+	OR  shift 38
+	.  error
+
+
+state 81
+	primary:  FUNC LPAREN parameters.RPAREN block 
+	parameters:  parameters.COMMA IDENTIFIER 
+
+	COMMA  shift 92
+	RPAREN  shift 91
+	.  error
+
+
+state 82
+	parameters:  IDENTIFIER.    (51)
+
+	.  reduce 51 (src line 456)
+
+
+83: shift/reduce conflict (shift 27(5), red'n 10(0)) on MINUS
+83: shift/reduce conflict (shift 41(9), red'n 10(0)) on LPAREN
+83: shift/reduce conflict (shift 39(9), red'n 10(0)) on LBRACKET
+state 83
 	statement:  VAR IDENTIFIER ASSIGNMENT expression.optSemicolon 
 	expression:  expression.PLUS expression 
 	expression:  expression.MINUS expression 
@@ -1422,62 +1547,65 @@ state 73
 	expression:  expression.AND expression 
 	expression:  expression.OR expression 
 	expression:  expression.LBRACKET expression RBRACKET 
+	expression:  expression.DOT IDENTIFIER 
 	expression:  expression.LPAREN arguments RPAREN 
 	optSemicolon: .    (10)
 
-	PLUS  shift 25
-	MINUS  shift 26
-	MULTIPLY  shift 27
-	DIVIDE  shift 28
-	MODULUS  shift 29
-	EQUAL  shift 30
-	NOT_EQUAL  shift 31
-	GREATER_THAN  shift 32
-	LESS_THAN  shift 33
-	GREATER_THAN_OR_EQUAL  shift 34
-	LESS_THAN_OR_EQUAL  shift 35
-	SEMICOLON  shift 40
-	LPAREN  shift 39
-	LBRACKET  shift 38
-	AND  shift 36
-	OR  shift 37
-	.  reduce 10 (src line 144)
+	PLUS  shift 26
+	MINUS  shift 27
+	MULTIPLY  shift 28
+	DIVIDE  shift 29
+	MODULUS  shift 30
+	EQUAL  shift 31
+	NOT_EQUAL  shift 32
+	GREATER_THAN  shift 33
+	LESS_THAN  shift 34
+	GREATER_THAN_OR_EQUAL  shift 35
+	LESS_THAN_OR_EQUAL  shift 36
+	SEMICOLON  shift 42
+	DOT  shift 40
+	LPAREN  shift 41
+	LBRACKET  shift 39
+	AND  shift 37
+	OR  shift 38
+	.  reduce 10 (src line 149)
 
-	optSemicolon  goto 81
+	optSemicolon  goto 93
 
-state 74
+state 84
 	expression:  expression LBRACKET expression RBRACKET.    (29)
 
-	.  reduce 29 (src line 299)
+	.  reduce 29 (src line 304)
 
 
-state 75
-	expression:  expression LPAREN arguments RPAREN.    (30)
+state 85
+	expression:  expression LPAREN arguments RPAREN.    (31)
 
-	.  reduce 30 (src line 307)
+	.  reduce 31 (src line 320)
 
 
-state 76
+state 86
 	arguments:  arguments COMMA.expression 
 
 	IDENTIFIER  shift 11
 	INT  shift 12
 	STRING  shift 13
 	MINUS  shift 9
-	LPAREN  shift 18
+	LPAREN  shift 19
 	LBRACKET  shift 17
-	FUNC  shift 20
-	IF  shift 19
+	LBRACE  shift 18
+	FUNC  shift 21
+	IF  shift 20
 	NIL  shift 16
 	TRUE  shift 14
 	FALSE  shift 15
 	NOT  shift 10
 	.  error
 
-	expression  goto 82
+	expression  goto 94
 	primary  goto 8
 
-state 77
+state 87
 	expression:  expression.PLUS expression 
 	expression:  expression.MINUS expression 
 	expression:  expression.MULTIPLY expression 
@@ -1492,58 +1620,105 @@ state 77
 	expression:  expression.AND expression 
 	expression:  expression.OR expression 
 	expression:  expression.LBRACKET expression RBRACKET 
+	expression:  expression.DOT IDENTIFIER 
 	expression:  expression.LPAREN arguments RPAREN 
-	expressionList:  expressionList COMMA expression.    (44)
+	expressionList:  expressionList COMMA expression.    (47)
 
-	PLUS  shift 25
-	MINUS  shift 26
-	MULTIPLY  shift 27
-	DIVIDE  shift 28
-	MODULUS  shift 29
-	EQUAL  shift 30
-	NOT_EQUAL  shift 31
-	GREATER_THAN  shift 32
-	LESS_THAN  shift 33
-	GREATER_THAN_OR_EQUAL  shift 34
-	LESS_THAN_OR_EQUAL  shift 35
-	LPAREN  shift 39
-	LBRACKET  shift 38
-	AND  shift 36
-	OR  shift 37
-	.  reduce 44 (src line 408)
+	PLUS  shift 26
+	MINUS  shift 27
+	MULTIPLY  shift 28
+	DIVIDE  shift 29
+	MODULUS  shift 30
+	EQUAL  shift 31
+	NOT_EQUAL  shift 32
+	GREATER_THAN  shift 33
+	LESS_THAN  shift 34
+	GREATER_THAN_OR_EQUAL  shift 35
+	LESS_THAN_OR_EQUAL  shift 36
+	DOT  shift 40
+	LPAREN  shift 41
+	LBRACKET  shift 39
+	AND  shift 37
+	OR  shift 38
+	.  reduce 47 (src line 435)
 
 
-state 78
+state 88
+	objectPairsList:  objectPairsList COMMA IDENTIFIER.COLON expression 
+
+	COLON  shift 95
+	.  error
+
+
+state 89
+	expression:  expression.PLUS expression 
+	expression:  expression.MINUS expression 
+	expression:  expression.MULTIPLY expression 
+	expression:  expression.DIVIDE expression 
+	expression:  expression.MODULUS expression 
+	expression:  expression.EQUAL expression 
+	expression:  expression.NOT_EQUAL expression 
+	expression:  expression.GREATER_THAN expression 
+	expression:  expression.LESS_THAN expression 
+	expression:  expression.GREATER_THAN_OR_EQUAL expression 
+	expression:  expression.LESS_THAN_OR_EQUAL expression 
+	expression:  expression.AND expression 
+	expression:  expression.OR expression 
+	expression:  expression.LBRACKET expression RBRACKET 
+	expression:  expression.DOT IDENTIFIER 
+	expression:  expression.LPAREN arguments RPAREN 
+	objectPairsList:  IDENTIFIER COLON expression.    (55)
+
+	PLUS  shift 26
+	MINUS  shift 27
+	MULTIPLY  shift 28
+	DIVIDE  shift 29
+	MODULUS  shift 30
+	EQUAL  shift 31
+	NOT_EQUAL  shift 32
+	GREATER_THAN  shift 33
+	LESS_THAN  shift 34
+	GREATER_THAN_OR_EQUAL  shift 35
+	LESS_THAN_OR_EQUAL  shift 36
+	DOT  shift 40
+	LPAREN  shift 41
+	LBRACKET  shift 39
+	AND  shift 37
+	OR  shift 38
+	.  reduce 55 (src line 486)
+
+
+state 90
 	primary:  IF LPAREN expression RPAREN.block 
 	primary:  IF LPAREN expression RPAREN.block ELSE block 
 
-	LBRACE  shift 84
+	LBRACE  shift 97
 	.  error
 
-	block  goto 83
+	block  goto 96
 
-state 79
+state 91
 	primary:  FUNC LPAREN parameters RPAREN.block 
 
-	LBRACE  shift 84
+	LBRACE  shift 97
 	.  error
 
-	block  goto 85
+	block  goto 98
 
-state 80
+state 92
 	parameters:  parameters COMMA.IDENTIFIER 
 
-	IDENTIFIER  shift 86
+	IDENTIFIER  shift 99
 	.  error
 
 
-state 81
+state 93
 	statement:  VAR IDENTIFIER ASSIGNMENT expression optSemicolon.    (5)
 
-	.  reduce 5 (src line 90)
+	.  reduce 5 (src line 95)
 
 
-state 82
+state 94
 	expression:  expression.PLUS expression 
 	expression:  expression.MINUS expression 
 	expression:  expression.MULTIPLY expression 
@@ -1558,36 +1733,59 @@ state 82
 	expression:  expression.AND expression 
 	expression:  expression.OR expression 
 	expression:  expression.LBRACKET expression RBRACKET 
+	expression:  expression.DOT IDENTIFIER 
 	expression:  expression.LPAREN arguments RPAREN 
-	arguments:  arguments COMMA expression.    (46)
+	arguments:  arguments COMMA expression.    (49)
 
-	PLUS  shift 25
-	MINUS  shift 26
-	MULTIPLY  shift 27
-	DIVIDE  shift 28
-	MODULUS  shift 29
-	EQUAL  shift 30
-	NOT_EQUAL  shift 31
-	GREATER_THAN  shift 32
-	LESS_THAN  shift 33
-	GREATER_THAN_OR_EQUAL  shift 34
-	LESS_THAN_OR_EQUAL  shift 35
-	LPAREN  shift 39
-	LBRACKET  shift 38
-	AND  shift 36
-	OR  shift 37
-	.  reduce 46 (src line 419)
+	PLUS  shift 26
+	MINUS  shift 27
+	MULTIPLY  shift 28
+	DIVIDE  shift 29
+	MODULUS  shift 30
+	EQUAL  shift 31
+	NOT_EQUAL  shift 32
+	GREATER_THAN  shift 33
+	LESS_THAN  shift 34
+	GREATER_THAN_OR_EQUAL  shift 35
+	LESS_THAN_OR_EQUAL  shift 36
+	DOT  shift 40
+	LPAREN  shift 41
+	LBRACKET  shift 39
+	AND  shift 37
+	OR  shift 38
+	.  reduce 49 (src line 446)
 
 
-state 83
-	primary:  IF LPAREN expression RPAREN block.    (40)
+state 95
+	objectPairsList:  objectPairsList COMMA IDENTIFIER COLON.expression 
+
+	IDENTIFIER  shift 11
+	INT  shift 12
+	STRING  shift 13
+	MINUS  shift 9
+	LPAREN  shift 19
+	LBRACKET  shift 17
+	LBRACE  shift 18
+	FUNC  shift 21
+	IF  shift 20
+	NIL  shift 16
+	TRUE  shift 14
+	FALSE  shift 15
+	NOT  shift 10
+	.  error
+
+	expression  goto 100
+	primary  goto 8
+
+state 96
+	primary:  IF LPAREN expression RPAREN block.    (43)
 	primary:  IF LPAREN expression RPAREN block.ELSE block 
 
-	ELSE  shift 87
-	.  reduce 40 (src line 376)
+	ELSE  shift 101
+	.  reduce 43 (src line 403)
 
 
-state 84
+state 97
 	block:  LBRACE.statements RBRACE 
 	block:  LBRACE.RBRACE 
 
@@ -1596,45 +1794,84 @@ state 84
 	INT  shift 12
 	STRING  shift 13
 	MINUS  shift 9
-	LPAREN  shift 18
+	LPAREN  shift 19
 	LBRACKET  shift 17
-	RBRACE  shift 89
+	LBRACE  shift 18
+	RBRACE  shift 103
 	VAR  shift 4
-	FUNC  shift 20
+	FUNC  shift 21
 	RETURN  shift 5
-	IF  shift 19
+	IF  shift 20
 	NIL  shift 16
 	TRUE  shift 14
 	FALSE  shift 15
 	NOT  shift 10
 	.  error
 
-	statements  goto 88
+	statements  goto 102
 	statement  goto 3
 	expression  goto 6
 	primary  goto 8
 
-state 85
-	primary:  FUNC LPAREN parameters RPAREN block.    (42)
+state 98
+	primary:  FUNC LPAREN parameters RPAREN block.    (45)
 
-	.  reduce 42 (src line 393)
-
-
-state 86
-	parameters:  parameters COMMA IDENTIFIER.    (49)
-
-	.  reduce 49 (src line 439)
+	.  reduce 45 (src line 420)
 
 
-state 87
+state 99
+	parameters:  parameters COMMA IDENTIFIER.    (52)
+
+	.  reduce 52 (src line 466)
+
+
+state 100
+	expression:  expression.PLUS expression 
+	expression:  expression.MINUS expression 
+	expression:  expression.MULTIPLY expression 
+	expression:  expression.DIVIDE expression 
+	expression:  expression.MODULUS expression 
+	expression:  expression.EQUAL expression 
+	expression:  expression.NOT_EQUAL expression 
+	expression:  expression.GREATER_THAN expression 
+	expression:  expression.LESS_THAN expression 
+	expression:  expression.GREATER_THAN_OR_EQUAL expression 
+	expression:  expression.LESS_THAN_OR_EQUAL expression 
+	expression:  expression.AND expression 
+	expression:  expression.OR expression 
+	expression:  expression.LBRACKET expression RBRACKET 
+	expression:  expression.DOT IDENTIFIER 
+	expression:  expression.LPAREN arguments RPAREN 
+	objectPairsList:  objectPairsList COMMA IDENTIFIER COLON expression.    (56)
+
+	PLUS  shift 26
+	MINUS  shift 27
+	MULTIPLY  shift 28
+	DIVIDE  shift 29
+	MODULUS  shift 30
+	EQUAL  shift 31
+	NOT_EQUAL  shift 32
+	GREATER_THAN  shift 33
+	LESS_THAN  shift 34
+	GREATER_THAN_OR_EQUAL  shift 35
+	LESS_THAN_OR_EQUAL  shift 36
+	DOT  shift 40
+	LPAREN  shift 41
+	LBRACKET  shift 39
+	AND  shift 37
+	OR  shift 38
+	.  reduce 56 (src line 492)
+
+
+state 101
 	primary:  IF LPAREN expression RPAREN block ELSE.block 
 
-	LBRACE  shift 84
+	LBRACE  shift 97
 	.  error
 
-	block  goto 90
+	block  goto 104
 
-state 88
+state 102
 	statements:  statements.statement 
 	block:  LBRACE statements.RBRACE 
 
@@ -1643,50 +1880,51 @@ state 88
 	INT  shift 12
 	STRING  shift 13
 	MINUS  shift 9
-	LPAREN  shift 18
+	LPAREN  shift 19
 	LBRACKET  shift 17
-	RBRACE  shift 91
+	LBRACE  shift 18
+	RBRACE  shift 105
 	VAR  shift 4
-	FUNC  shift 20
+	FUNC  shift 21
 	RETURN  shift 5
-	IF  shift 19
+	IF  shift 20
 	NIL  shift 16
 	TRUE  shift 14
 	FALSE  shift 15
 	NOT  shift 10
 	.  error
 
-	statement  goto 21
+	statement  goto 22
 	expression  goto 6
 	primary  goto 8
 
-state 89
+state 103
 	block:  LBRACE RBRACE.    (12)
 
-	.  reduce 12 (src line 155)
+	.  reduce 12 (src line 160)
 
 
-state 90
-	primary:  IF LPAREN expression RPAREN block ELSE block.    (41)
+state 104
+	primary:  IF LPAREN expression RPAREN block ELSE block.    (44)
 
-	.  reduce 41 (src line 384)
+	.  reduce 44 (src line 411)
 
 
-state 91
+state 105
 	block:  LBRACE statements RBRACE.    (11)
 
-	.  reduce 11 (src line 147)
+	.  reduce 11 (src line 152)
 
 
-39 terminals, 11 nonterminals
-51 grammar rules, 92/16000 states
-39 shift/reduce, 0 reduce/reduce conflicts reported
-60 working sets used
-memory: parser 68/240000
-80 extra closures
-620 shift entries, 3 exceptions
-41 goto entries
-31 entries saved by goto default
-Optimizer space used: output 386/240000
-386 table entries, 128 zero
-maximum spread: 37, maximum offset: 88
+41 terminals, 13 nonterminals
+57 grammar rules, 106/16000 states
+9 shift/reduce, 0 reduce/reduce conflicts reported
+62 working sets used
+memory: parser 74/240000
+86 extra closures
+739 shift entries, 3 exceptions
+45 goto entries
+33 entries saved by goto default
+Optimizer space used: output 416/240000
+416 table entries, 130 zero
+maximum spread: 39, maximum offset: 102

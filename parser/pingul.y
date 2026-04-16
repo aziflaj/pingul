@@ -21,6 +21,7 @@ var parseErrors []string
 	expression       ast.Expression
 	expressions      []ast.Expression
 	identifiers      []*ast.Identifier
+	objPairs         map[string]ast.Expression
 	token            token.Token
 	literal          []rune
 	intVal           int64
@@ -30,7 +31,7 @@ var parseErrors []string
 %token <token>  IDENTIFIER INT STRING
 %token <token>  PLUS MINUS MULTIPLY DIVIDE MODULUS
 %token <token>  EQUAL NOT_EQUAL GREATER_THAN LESS_THAN GREATER_THAN_OR_EQUAL LESS_THAN_OR_EQUAL
-%token <token>  ASSIGNMENT COMMA SEMICOLON
+%token <token>  ASSIGNMENT COMMA SEMICOLON COLON DOT
 %token <token>  LPAREN RPAREN LBRACKET RBRACKET LBRACE RBRACE
 %token <token>  VAR FUNC RETURN IF ELSE NIL TRUE FALSE AND OR NOT
 
@@ -43,6 +44,8 @@ var parseErrors []string
 %type <expressions>     expressionList
 %type <expressions>     arguments
 %type <identifiers>     parameters
+%type <objPairs>        objectPairs
+%type <objPairs>        objectPairsList
 
 /* Operator precedence and associativity */
 %left OR
@@ -52,6 +55,8 @@ var parseErrors []string
 %left PLUS MINUS
 %left MULTIPLY DIVIDE MODULUS
 %right UNARY_MINUS UNARY_NOT
+%left DOT
+%left LPAREN RPAREN LBRACKET RBRACKET
 
 %%
 
@@ -304,6 +309,14 @@ expression
 			Index: $3,
 		}
 	}
+	| expression DOT IDENTIFIER
+	{
+		$$ = &ast.PropertyAccess{
+			Token:    $2,
+			Object:   $1,
+			Property: string($3.Literal),
+		}
+	}
 	| expression LPAREN arguments RPAREN
 	{
 		$$ = &ast.CallExpression{
@@ -367,6 +380,20 @@ primary
 		$$ = &ast.List{
 			Token: $1,
 			Items: []ast.Expression{},
+		}
+	}
+	| LBRACE objectPairs RBRACE
+	{
+		$$ = &ast.ObjectLiteral{
+			Token: $1,
+			Pairs: $2,
+		}
+	}
+	| LBRACE RBRACE
+	{
+		$$ = &ast.ObjectLiteral{
+			Token: $1,
+			Pairs: make(map[string]ast.Expression),
 		}
 	}
 	| LPAREN expression RPAREN
@@ -449,6 +476,26 @@ parameters
 	}
 	;
 
+objectPairs
+	: objectPairsList
+	{
+		$$ = $1
+	}
+	;
+
+objectPairsList
+	: IDENTIFIER COLON expression
+	{
+		$$ = make(map[string]ast.Expression)
+		$$[string($1.Literal)] = $3
+	}
+	| objectPairsList COMMA IDENTIFIER COLON expression
+	{
+		$1[string($3.Literal)] = $5
+		$$ = $1
+	}
+	;
+
 %%
 
 type YaccLexer struct {
@@ -504,6 +551,10 @@ func (l *YaccLexer) Lex(lval *yySymType) int {
 		return COMMA
 	case token.SEMICOLON:
 		return SEMICOLON
+	case token.COLON:
+		return COLON
+	case token.DOT:
+		return DOT
 	case token.LPAREN:
 		return LPAREN
 	case token.RPAREN:

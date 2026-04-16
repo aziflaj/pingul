@@ -14,6 +14,7 @@ const (
 	BOOL           = ObjectType("BOOL")
 	STRING         = ObjectType("STRING")
 	LIST           = ObjectType("LIST")
+	DICT           = ObjectType("DICT")
 	NIL            = ObjectType("NIL")
 	RETURN         = ObjectType("RETURN")
 	FUNC           = ObjectType("FUNC")
@@ -71,6 +72,31 @@ func (l *List) Inspect() string {
 	return b.String()
 }
 func (l *List) IsTruthy() bool { return len(l.Items) > 0 }
+
+type Dict struct {
+	Pairs map[string]Object
+}
+
+func (d *Dict) Type() ObjectType { return DICT }
+func (d *Dict) Inspect() string {
+	var b strings.Builder
+
+	b.WriteString("{")
+	first := true
+	for key, value := range d.Pairs {
+		if !first {
+			b.WriteString(", ")
+		}
+		first = false
+		b.WriteString(key)
+		b.WriteString(": ")
+		b.WriteString(value.Inspect())
+	}
+	b.WriteString("}")
+
+	return b.String()
+}
+func (d *Dict) IsTruthy() bool { return len(d.Pairs) > 0 }
 
 type Nil struct{}
 

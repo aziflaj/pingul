@@ -36,6 +36,28 @@ func Eval(scope *object.Scope, node ast.Node) object.Object {
 
 		return list
 
+	case *ast.ObjectLiteral:
+		dict := &object.Dict{Pairs: make(map[string]object.Object)}
+
+		for key, value := range node.Pairs {
+			dict.Pairs[key] = Eval(scope, value)
+		}
+
+		return dict
+
+	case *ast.PropertyAccess:
+		obj := Eval(scope, node.Object)
+
+		if obj.Type() == object.DICT {
+			val, ok := obj.(*object.Dict).Pairs[node.Property]
+			if ok {
+				return val
+			}
+			return &object.Nil{}
+		}
+
+		return &object.Nil{}
+
 	case *ast.IndexExpression:
 		list := Eval(scope, node.List)
 		index := Eval(scope, node.Index)

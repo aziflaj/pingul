@@ -434,7 +434,94 @@ var fib = func(n) {
 	}
 }
 
+func TestObjectLiteral(t *testing.T) {
+	input := `var obj = { key: "value" }; obj`
+
+	lxr := lexer.New(input)
+	psr := parser.New(lxr)
+	program := psr.ParseProgram()
+	scope := object.NewScope()
+
+	result := eval.Eval(scope, program)
+
+	dict, ok := result.(*object.Dict)
+	if !ok {
+		t.Fatalf("Object is not a Dict. Got=%T", result)
+	}
+
+	if len(dict.Pairs) != 1 {
+		t.Fatalf("Dict has wrong number of pairs. Got=%d, Expected=1", len(dict.Pairs))
+	}
+
+	val, ok := dict.Pairs["key"]
+	if !ok {
+		t.Fatalf("Dict does not have key 'key'")
+	}
+
+	strVal, ok := val.(*object.String)
+	if !ok {
+		t.Fatalf("Value is not a String. Got=%T", val)
+	}
+
+	if string(strVal.Value) != "value" {
+		t.Fatalf("String value is wrong. Got=%s, Expected=value", string(strVal.Value))
+	}
+}
+
+func TestPropertyAccess(t *testing.T) {
+	testCases := []struct {
+		input    string
+		expected interface{}
+	}{
+		{`var obj = { key: "value" }; obj.key;`, "value"},
+		{`var obj = { num: 42 }; obj.num;`, int64(42)},
+		{`var obj = { flag: true }; obj.flag;`, true},
+		{`var obj = { nested: { inner: "deep" } }; obj.nested.inner;`, "deep"},
+		{`var obj = { list: [1, 2, 3] }; obj.list[1];`, int64(2)},
+		{`var obj = { nested: { list: ["a", "b"] } }; obj.nested.list[0];`, "a"},
+	}
+
+	for _, tc := range testCases {
+		evaluated := evalProgram(tc.input)
+
+		switch expected := tc.expected.(type) {
+		case string:
+			assertStringObject(t, evaluated, expected)
+		case int64:
+			assertIntegerObject(t, evaluated, expected)
+		case bool:
+			assertBooleanObject(t, evaluated, expected)
+		}
+	}
+}
+
+func TestEmptyObject(t *testing.T) {
+	input := `{}`
+
+	evaluated := evalProgram(input)
+
+	dict, ok := evaluated.(*object.Dict)
+	if !ok {
+		t.Fatalf("Object is not a Dict. Got=%T", evaluated)
+	}
+
+	if len(dict.Pairs) != 0 {
+		t.Fatalf("Dict should be empty. Got=%d pairs", len(dict.Pairs))
+	}
+}
+
 ///////// HELPER FUNCTIONS //////////
+
+func assertStringObject(t *testing.T, obj object.Object, expected string) {
+	str, ok := obj.(*object.String)
+	if !ok {
+		t.Fatalf("Object is not a String. Got=%T", obj)
+	}
+
+	if string(str.Value) != expected {
+		t.Fatalf("String value is wrong. Got=%s, Expected=%s", string(str.Value), expected)
+	}
+}
 
 func assertIntegerObject(t *testing.T, obj object.Object, expected int64) {
 	integer, ok := obj.(*object.Integer)
