@@ -510,6 +510,99 @@ func TestEmptyObject(t *testing.T) {
 	}
 }
 
+func TestObjectWithFunctions(t *testing.T) {
+	testCases := []struct {
+		input    string
+		expected interface{}
+	}{
+		// Simple function property
+		{`var squarer = { perform: func(x) { x * 2 } }; squarer.perform(5);`, int64(10)},
+		// Function returning string
+		{`var greeter = { greet: func(name) { "Hello, " + name } }; greeter.greet("World");`, "Hello, World"},
+		// Nested object with function
+		{`var obj = { math: { add: func(a, b) { a + b } } }; obj.math.add(3, 4);`, int64(7)},
+		// Multiple functions in object
+		{`var calc = { double: func(x) { x * 2 }, square: func(x) { x * x } }; calc.double(4);`, int64(8)},
+		{`var calc = { double: func(x) { x * 2 }, square: func(x) { x * x } }; calc.square(4);`, int64(16)},
+		// Object with mixed properties
+		{`var obj = { name: "test", fn: func(n) { n + 100 } }; obj.fn(5);`, int64(105)},
+		// Accessing non-existent property returns nil
+		{`var obj = { x: 1 }; obj.y;`, nil},
+	}
+
+	for _, tc := range testCases {
+		evaluated := evalProgram(tc.input)
+
+		switch expected := tc.expected.(type) {
+		case string:
+			assertStringObject(t, evaluated, expected)
+		case int64:
+			assertIntegerObject(t, evaluated, expected)
+		case nil:
+			_, ok := evaluated.(*object.Nil)
+			if !ok {
+				t.Fatalf("Expected Nil, Got=%T", evaluated)
+			}
+		}
+	}
+}
+
+func TestObjectMethodCalls(t *testing.T) {
+	input := `
+		var calculator = {
+			add: func(a, b) { a + b },
+			multiply: func(a, b) { a * b },
+			power: func(base, exp) { 
+				if (exp == 0) { 
+					1 
+				} else { 
+					base * base 
+				} 
+			}
+		};
+
+		calculator.add(10, 20);
+	`
+
+	evaluated := evalProgram(input)
+	assertIntegerObject(t, evaluated, 30)
+}
+
+func TestComplexObjectStructure(t *testing.T) {
+	input := `
+		var user = {
+			name: "Alice",
+			age: 30,
+			address: {
+				street: "Main St",
+				zip: 12345
+			},
+			getInfo: func() { "Alice is 30 years old" }
+		};
+
+		user.getInfo();
+	`
+
+	evaluated := evalProgram(input)
+	assertStringObject(t, evaluated, "Alice is 30 years old")
+}
+
+func TestObjectPropertyAccess(t *testing.T) {
+	input := `
+		var obj = {
+			data: [10, 20, 30],
+			getFirst: func() { 
+				obj.data[0]
+			}
+		};
+
+		obj.getFirst();
+	`
+
+	evaluated := evalProgram(input)
+	assertIntegerObject(t, evaluated, 10)
+}
+
 ///////// HELPER FUNCTIONS //////////
 
 func assertStringObject(t *testing.T, obj object.Object, expected string) {
