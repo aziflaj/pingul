@@ -4,7 +4,18 @@ import (
 	"github.com/aziflaj/pingul/token"
 )
 
+// Lexer (for goyacc) wraps LexerImpl
 type Lexer struct {
+	impl *LexerImpl
+}
+
+// Impl returns the underlying LexerImpl
+func (l *Lexer) Impl() *LexerImpl {
+	return l.impl
+}
+
+// LexerImpl is the internal lexer implementation
+type LexerImpl struct {
 	input []rune
 
 	position     int
@@ -15,12 +26,24 @@ type Lexer struct {
 }
 
 func New(input string) *Lexer {
-	lxr := &Lexer{input: []rune(input)}
+	impl := &LexerImpl{input: []rune(input)}
+	impl.readChar()
+	return &Lexer{impl: impl}
+}
+
+func NewLexerImpl(input string) *LexerImpl {
+	lxr := &LexerImpl{input: []rune(input)}
 	lxr.readChar()
 	return lxr
 }
 
+// NextToken for Lexer wrapper
 func (l *Lexer) NextToken() token.Token {
+	return l.impl.NextToken()
+}
+
+// NextToken for LexerImpl
+func (l *LexerImpl) NextToken() token.Token {
 	tkn := token.Token{Literal: l.readNextToken()}
 
 	// handle empty literals, i.e. EOF, whitespace, newlines, tabs,	etc.
@@ -62,7 +85,7 @@ getNextToken:
 	return tkn
 }
 
-func (l *Lexer) readChar() {
+func (l *LexerImpl) readChar() {
 	if l.readPosition >= len(l.input) {
 		l.ch = 0
 	} else {
@@ -74,7 +97,7 @@ func (l *Lexer) readChar() {
 	l.readPosition += 1
 }
 
-func (l *Lexer) readNextToken() []rune {
+func (l *LexerImpl) readNextToken() []rune {
 	var word []rune
 	var readingString bool // read strings in full, even if they contain spaces
 

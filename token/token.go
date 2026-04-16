@@ -37,6 +37,8 @@ const (
 	// Delimiters
 	COMMA
 	SEMICOLON
+	COLON
+	DOT
 
 	LPAREN
 	RPAREN
@@ -82,6 +84,8 @@ var Delimiters = map[rune]TokenType{
 	'}': RBRACE,
 	',': COMMA,
 	';': SEMICOLON,
+	':': COLON,
+	'.': DOT,
 }
 
 var UnaryOperators = map[rune]TokenType{
@@ -178,6 +182,8 @@ func (t Token) String() string {
 		RBRACKET:              "]",
 		LBRACE:                "{",
 		RBRACE:                "}",
+		COLON:                 ":",
+		DOT:                   ".",
 		NIL:                   "nil",
 		VAR:                   "var",
 		FUNC:                  "func",

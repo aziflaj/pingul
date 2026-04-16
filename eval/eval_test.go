@@ -434,7 +434,187 @@ var fib = func(n) {
 	}
 }
 
+func TestObjectLiteral(t *testing.T) {
+	input := `var obj = { key: "value" }; obj`
+
+	lxr := lexer.New(input)
+	psr := parser.New(lxr)
+	program := psr.ParseProgram()
+	scope := object.NewScope()
+
+	result := eval.Eval(scope, program)
+
+	dict, ok := result.(*object.Dict)
+	if !ok {
+		t.Fatalf("Object is not a Dict. Got=%T", result)
+	}
+
+	if len(dict.Pairs) != 1 {
+		t.Fatalf("Dict has wrong number of pairs. Got=%d, Expected=1", len(dict.Pairs))
+	}
+
+	val, ok := dict.Pairs["key"]
+	if !ok {
+		t.Fatalf("Dict does not have key 'key'")
+	}
+
+	strVal, ok := val.(*object.String)
+	if !ok {
+		t.Fatalf("Value is not a String. Got=%T", val)
+	}
+
+	if string(strVal.Value) != "value" {
+		t.Fatalf("String value is wrong. Got=%s, Expected=value", string(strVal.Value))
+	}
+}
+
+func TestPropertyAccess(t *testing.T) {
+	testCases := []struct {
+		input    string
+		expected interface{}
+	}{
+		{`var obj = { key: "value" }; obj.key;`, "value"},
+		{`var obj = { num: 42 }; obj.num;`, int64(42)},
+		{`var obj = { flag: true }; obj.flag;`, true},
+		{`var obj = { nested: { inner: "deep" } }; obj.nested.inner;`, "deep"},
+		{`var obj = { list: [1, 2, 3] }; obj.list[1];`, int64(2)},
+		{`var obj = { nested: { list: ["a", "b"] } }; obj.nested.list[0];`, "a"},
+	}
+
+	for _, tc := range testCases {
+		evaluated := evalProgram(tc.input)
+
+		switch expected := tc.expected.(type) {
+		case string:
+			assertStringObject(t, evaluated, expected)
+		case int64:
+			assertIntegerObject(t, evaluated, expected)
+		case bool:
+			assertBooleanObject(t, evaluated, expected)
+		}
+	}
+}
+
+func TestEmptyObject(t *testing.T) {
+	input := `{}`
+
+	evaluated := evalProgram(input)
+
+	dict, ok := evaluated.(*object.Dict)
+	if !ok {
+		t.Fatalf("Object is not a Dict. Got=%T", evaluated)
+	}
+
+	if len(dict.Pairs) != 0 {
+		t.Fatalf("Dict should be empty. Got=%d pairs", len(dict.Pairs))
+	}
+}
+
+func TestObjectWithFunctions(t *testing.T) {
+	testCases := []struct {
+		input    string
+		expected interface{}
+	}{
+		// Simple function property
+		{`var squarer = { perform: func(x) { x * 2 } }; squarer.perform(5);`, int64(10)},
+		// Function returning string
+		{`var greeter = { greet: func(name) { "Hello, " + name } }; greeter.greet("World");`, "Hello, World"},
+		// Nested object with function
+		{`var obj = { math: { add: func(a, b) { a + b } } }; obj.math.add(3, 4);`, int64(7)},
+		// Multiple functions in object
+		{`var calc = { double: func(x) { x * 2 }, square: func(x) { x * x } }; calc.double(4);`, int64(8)},
+		{`var calc = { double: func(x) { x * 2 }, square: func(x) { x * x } }; calc.square(4);`, int64(16)},
+		// Object with mixed properties
+		{`var obj = { name: "test", fn: func(n) { n + 100 } }; obj.fn(5);`, int64(105)},
+		// Accessing non-existent property returns nil
+		{`var obj = { x: 1 }; obj.y;`, nil},
+	}
+
+	for _, tc := range testCases {
+		evaluated := evalProgram(tc.input)
+
+		switch expected := tc.expected.(type) {
+		case string:
+			assertStringObject(t, evaluated, expected)
+		case int64:
+			assertIntegerObject(t, evaluated, expected)
+		case nil:
+			_, ok := evaluated.(*object.Nil)
+			if !ok {
+				t.Fatalf("Expected Nil, Got=%T", evaluated)
+			}
+		}
+	}
+}
+
+func TestObjectMethodCalls(t *testing.T) {
+	input := `
+		var calculator = {
+			add: func(a, b) { a + b },
+			multiply: func(a, b) { a * b },
+			power: func(base, exp) { 
+				if (exp == 0) { 
+					1 
+				} else { 
+					base * base 
+				} 
+			}
+		};
+
+		calculator.add(10, 20);
+	`
+
+	evaluated := evalProgram(input)
+	assertIntegerObject(t, evaluated, 30)
+}
+
+func TestComplexObjectStructure(t *testing.T) {
+	input := `
+		var user = {
+			name: "Alice",
+			age: 30,
+			address: {
+				street: "Main St",
+				zip: 12345
+			},
+			getInfo: func() { "Alice is 30 years old" }
+		};
+
+		user.getInfo();
+	`
+
+	evaluated := evalProgram(input)
+	assertStringObject(t, evaluated, "Alice is 30 years old")
+}
+
+func TestObjectPropertyAccess(t *testing.T) {
+	input := `
+		var obj = {
+			data: [10, 20, 30],
+			getFirst: func() { 
+				obj.data[0]
+			}
+		};
+
+		obj.getFirst();
+	`
+
+	evaluated := evalProgram(input)
+	assertIntegerObject(t, evaluated, 10)
+}
+
 ///////// HELPER FUNCTIONS //////////
+
+func assertStringObject(t *testing.T, obj object.Object, expected string) {
+	str, ok := obj.(*object.String)
+	if !ok {
+		t.Fatalf("Object is not a String. Got=%T", obj)
+	}
+
+	if string(str.Value) != expected {
+		t.Fatalf("String value is wrong. Got=%s, Expected=%s", string(str.Value), expected)
+	}
+}
 
 func assertIntegerObject(t *testing.T, obj object.Object, expected int64) {
 	integer, ok := obj.(*object.Integer)
